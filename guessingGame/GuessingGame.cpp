@@ -3,6 +3,13 @@ Noam Yaffe
 9/7/2022
 This program will allow the user to play a random number guessing game, where the user will input a number
 between 1-100, and will see whether the number they entered was too high, too low, or correct
+
+THE THREE RULES:
+1. No global variables. (Global constants are all right.)
+
+2. No strings. Not ever. (You can use cstrings/character arrays, and the cstring and cctype libraries are okay. In fact, I recommend using strcmp and strlen in your projects.)
+
+3. You should include <iostream>, not stdio. (This applies more to C programmers.)
 */
 
 #include <iostream>
