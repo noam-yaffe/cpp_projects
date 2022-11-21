@@ -1,7 +1,14 @@
+/*
+09/27/2022
+Noam Yaffe
+In this program the user is able to play a two-person TicTacToe game! each player has a symbol, X or O, and must get three in a row,
+column, or diagnol to gain a point. The game ends when the user decides he doesn't want to play another round.
+*/
 #include <iostream>
 
 using namespace std;
 
+//methods
 void resetBoard(char board[3][3]);
 void drawBoard(char board[3][3]);
 bool checkWinX(char board[3][3], int &xWins);
@@ -23,12 +30,14 @@ int main() {
   int playAgain = 0;
   int round = 0;
 
+  //printing out the board initially
   cout << "Welcome to Tic Tac Toe!" << endl;
   cout << "Player 1 is X, and player 2 is O" << endl;
   cout << "This is how the board looks like:" << endl;
   
   resetBoard(board);
-  
+
+  //the actual game
   while (playAgain == 0 || playAgain == 1) {
 
     round++;
@@ -41,7 +50,8 @@ int main() {
     else {
       turn = 2;
     }
-
+    
+    //getting user input
     cout << endl;
     cout << "Player " << turn << ", please enter the row letter: ";
     cin >> c;
@@ -50,10 +60,12 @@ int main() {
     cin >> column;
     column--;
 
+    //entering user input unless the spot is already taken
     if (board[row][column] != 'X' && board[row][column] !=   'O') {
       board[row][column] = symbols[turn];
     }
     else {
+      //user input is wrong
       while (!cont) {
         cout << endl;
         cout << "Spot is already taken. Try again." << endl;
@@ -63,22 +75,28 @@ int main() {
         cout << "Enter the column number: ";
         cin >> column;
         column--;
-        if (board[row][column] != 'X' && board[row][column] != 'O') {
+	//only inputting the symbol into the board if the user input if the spot is blank
+	if (board[row][column] != 'X' && board[row][column] != 'O') {
           board[row][column] = symbols[turn];
           cont = true;
         }
       }
     }
     cont = false;
-    
+
+    //checking for a win
     xWin = checkWinX(board, xWins);
     oWin = checkWinO(board, oWins);
-    
-    if (xWin == true || oWin == true) {
+
+    //printing out scores if somebody won and asking the user if they want to quit
+    if (xWin == true || oWin == true || round == 9) {
        cout << endl;
        drawBoard(board);
        cout << endl;
        resetBoard(board);
+       if (round == 9) {
+	 cout << "It's a tie!" << endl;
+       }
        cout << "X wins: " << xWins << endl;
        cout << "O wins: " << oWins << endl;
        cout << "Enter 1 to continue playing, enter 2 to quit: ";
@@ -94,6 +112,7 @@ int main() {
  
 }
 
+//resets the board to being blank
 void resetBoard(char board[3][3]) {
 
   for (int row = 0; row < 3; row++) {
@@ -104,6 +123,7 @@ void resetBoard(char board[3][3]) {
 
 }
 
+//drawing the board with its components (if there are any)
 void drawBoard(char board[3][3]) {
 
   cout << "  1  2  3" << endl;
@@ -113,6 +133,7 @@ void drawBoard(char board[3][3]) {
 
 }
 
+//checking all winning conditions for X (row, column, or diagonal)
 bool checkWinX(char board[3][3], int &xWins) {
 
   if (board[0][0] == 'X' && board[0][1] == 'X' && board[0][2] == 'X') {
@@ -161,6 +182,7 @@ bool checkWinX(char board[3][3], int &xWins) {
  
 }
 
+//checking all winning conditions for O (row, column, or diagonal)
 bool checkWinO(char board[3][3], int &oWins) {
 
   if (board[0][0] == 'O' && board[0][1] == 'O' && board[0][2] == 'O') {
