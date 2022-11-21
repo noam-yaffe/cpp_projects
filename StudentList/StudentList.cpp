@@ -1,3 +1,10 @@
+/*
+09/27/2022
+Noam Yaffe
+In this program, the user can make a list of student which includes each of the student's first and last names, their ID, and their GPA.
+These components are determined by the user's input, and the user can choose to add or delete a certain student by giving their respective ID,
+and can print our all of the students currently in the vector.
+*/
 #include <iostream>
 #include <cstring>
 #include <iomanip>
@@ -6,6 +13,7 @@
 
 using namespace std;
 
+//struct for student data
 struct Student {
 
   char first [20];
@@ -15,6 +23,7 @@ struct Student {
   
 };
 
+//methods
 void add(vector<Student*> &students);
 void print(vector<Student*> &students);
 void del(vector<Student*> &students, int idToDelete);
@@ -23,8 +32,10 @@ int main() {
 
   int idToDelete;
   char input[10];
+  //vector that holds all the students
   vector<Student*> students;
 
+  //welcome message and commands
   cout << "Welcome to StudentList! Here are the commands you can use:" << endl;
   cout << endl;
   cout << "Type \"ADD\" to add a student." << endl;
@@ -32,11 +43,14 @@ int main() {
   cout << "Type \"PRINT\" to print out all the students." << endl;
   cout << "Type \"QUIT\" to quit." << endl;
   
+  //where the user can start doing stuff
   do {
+    //getting user input for the command
     cout << endl;
     cout << "Enter a command: ";
     cin.get(input, 10);
     cin.get();
+    //checking what the command they entered is
     if (strcmp(input, "ADD") == 0) {
       add(students);
     }
@@ -53,15 +67,17 @@ int main() {
       cout << endl;
       cout << "This program has ended." << endl;
     }
+    //if the user didn't enter a valid command
     else {
       cout << "You didn't enter a valid command!" << endl;
     }
-  } while (strcmp(input, "QUIT") != 0);
+  } while (strcmp(input, "QUIT") != 0);//only end the program when 
   
   return 0;
   
 }
 
+//method for adding a student to the vector
 void add(vector<Student*> &students) {
 
   Student *student = new Student();
@@ -82,6 +98,7 @@ void add(vector<Student*> &students) {
   
 }
 
+//method for printing out all the students and their information from the vector
 void print(vector<Student*> &students) {
 
   vector<Student*>::iterator ptr;
@@ -96,6 +113,7 @@ void print(vector<Student*> &students) {
   
 }
 
+//method for deleting specific students from the vector, who are chosen through the id inputted by the user
 void del(vector<Student*> &students, int idToDelete) {
 
   vector<Student*>::iterator ptr;

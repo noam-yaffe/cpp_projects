@@ -50,7 +50,7 @@ int main() {
     else {
       turn = 2;
     }
-    
+
     //getting user input
     cout << endl;
     cout << "Player " << turn << ", please enter the row letter: ";
@@ -75,8 +75,9 @@ int main() {
         cout << "Enter the column number: ";
         cin >> column;
         column--;
-	//only inputting the symbol into the board if the user input if the spot is blank
-	if (board[row][column] != 'X' && board[row][column] != 'O') {
+
+        //only inputting the symbol into the board if the user input if the spot is blank
+        if (board[row][column] != 'X' && board[row][column] != 'O') {
           board[row][column] = symbols[turn];
           cont = true;
         }
@@ -112,7 +113,8 @@ int main() {
  
 }
 
-//resets the board to being blank
+//resets the board to blank
+
 void resetBoard(char board[3][3]) {
 
   for (int row = 0; row < 3; row++) {
