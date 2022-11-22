@@ -6,12 +6,17 @@
 using namespace std;
 
 //name, item(s), and exits
-Room::Room(char * name, char * north, char * east, char * south, char * west) {
-  strcpy(this->name, name);
-  exits.insert(pair<char*, char*>("NORTH".c_str(), north));
-  exits.insert(pair<char*, char*>("EAST".c_str(), east));
-  exits.insert(pair<char*, char*>("SOUTH".c_str(), south));
-  exits.insert(pair<char*, char*>("WEST".c_str(), west));
+Room::Room(const char * name, const char * north, const char * east,
+	   const char * south, const char * west) {
+  this->name = name;
+  northH = "NORTH";
+  eastH = "EAST";
+  southH = "SOUTH";
+  westH = "WEST";
+  exits.insert(pair<const char*, const char*>(northH, north));
+  exits.insert(pair<const char*, const char*>(eastH, east));
+  exits.insert(pair<const char*, const char*>(southH, south));
+  exits.insert(pair<const char*, const char*>(westH, west));
 }
 
 Room::Room() {}
@@ -30,12 +35,12 @@ void Room::description() {
 void Room::printExits() {
   cout << endl;
   cout << "Here are the exits available from this room:" << endl;
-  map<char*, char*>::iterator it;
+  map<const char*, const char*>::iterator it;
   for (it = exits.begin(); it != exits.end(); it++) {
-    cout << it->first << ": " << it->second;
+    cout << it->first << ": " << it->second << endl;
   }
 }
 
-char* Room::getName() {
+const char* Room::getName() {
   return name;
 }

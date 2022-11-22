@@ -7,13 +7,18 @@ using namespace std;
 
 class Room {
  public:
-  char * name = new char[20];
+  const char * name = new char[20];
+  const char * northH = new char[10];
+  const char * eastH = new char[10];
+  const char * southH = new char[10];
+  const char * westH = new char[10];
   vector <char*> items;
-  map<char*, char*> exits;
-  Room(char * name, char * north, char * east, char * south, char * west);
+  map<const char*, const char*> exits;
+  Room(const char * name, const char * north, const char * east,
+           const char * south, const char * west);
   Room();
   ~Room();
   void description();
   void printExits();
-  char* getName();
+  const char* getName();
 };

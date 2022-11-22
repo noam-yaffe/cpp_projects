@@ -7,14 +7,15 @@
 using namespace std;
 
 int main() {
+
+  //names of rooms
+  const char * nothing = "Nothing";
+  const char * front = "Front Enterance";
+  const char * m1 = "Main Hall 1";
   
   vector<char*> inventory;
-  char * currentRoom = new char[20];
-  currentRoom = "Front Enterance";
   
-  Room* FrontEnterance = new Room("Front Enterence".c_str(), "Nothing".c_str(),
-				  "Nothing".c_str(), "Nothing".c_str());
-  FrontEnterance->printExits();
+  Room* FrontEnterance = new Room(front, m1, nothing, nothing, nothing);
   
   cout << endl;
   cout << "Welcome to Zuul!" << endl;
@@ -24,7 +25,8 @@ int main() {
   cout << "Remember: You cannot leave until you find all five items!" << endl;
   cout << endl;
 
-  
+  cout << "You are currently at the " << front << endl;
+  FrontEnterance->printExits();
   
   return 0;
   
