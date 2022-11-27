@@ -6,17 +6,8 @@
 using namespace std;
 
 //name, item(s), and exits
-Room::Room(const char * name, const char * north, const char * east,
-	   const char * south, const char * west) {
+Room::Room(const char * name) {
   this->name = name;
-  northH = "NORTH";
-  eastH = "EAST";
-  southH = "SOUTH";
-  westH = "WEST";
-  exits.insert(pair<const char*, const char*>(northH, north));
-  exits.insert(pair<const char*, const char*>(eastH, east));
-  exits.insert(pair<const char*, const char*>(southH, south));
-  exits.insert(pair<const char*, const char*>(westH, west));
 }
 
 Room::Room() {}
@@ -26,18 +17,41 @@ Room::~Room() {
 }
 
 //description of the room: its name, the items in it, and its exit(s)
-void Room::description() {
-  cout << "You are in " << name << "!" << endl;
-  printExits();
+void Room::printDescription() {
+  cout << endl;
+  cout << "You are in " << name << endl;
+
+  if (exits.size() == 0) {
+    cout << endl;
+    cout << "The room has no exits" << endl;
+  }
+  else {
+    cout << endl;
+    cout << "The room has the following exits: " << endl;
+    map<const char*, Room*>::iterator it;
+    for (it = exits.begin(); it != exits.end(); ++it) {
+        cout << it->first << ": " << it->second->getName() << endl;
+    }
+  }
+}
+
+void Room::setExit(const char * exitDirection, Room* room) {
+  exits.insert(pair<const char*, Room*>(exitDirection, room));
 }
 
 //prints the exits of the room, called fromm the "description methods"
-void Room::printExits() {
-  cout << endl;
-  cout << "Here are the exits available from this room:" << endl;
-  map<const char*, const char*>::iterator it;
-  for (it = exits.begin(); it != exits.end(); it++) {
-    cout << it->first << ": " << it->second << endl;
+Room* Room::getExit(const char * exitName) {
+  map<const char*, Room*>::iterator it = exits.find(exitName);
+  for (it = exits.begin(); it != exits.end(); ++it) {
+    if (strcmp(exitName, it->first) == 0) {
+        break;
+    }
+  }
+  if (it == exits.end()) {
+    return NULL;
+  }
+  else {
+    return it->second;
   }
 }
 
