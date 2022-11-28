@@ -58,32 +58,75 @@ int main() {
   computerLab->setExit("SOUTH", roboticsClass);
   roboticsClass->setExit("NORTH", computerLab);
   roboticsClass->setExit("EAST", spanishClass);
-  
+
+  //all items
+  mainOffice->setItem("Student ID");
+  scienceClass->setItem("Notebook");
+  computerLab->setItem("Chromebook");
+  mathClass->setItem("Homework");
+  gym->setItem("Water Bottle");
+
+  //introducing Zuul
   cout << endl;
   cout << "Welcome to Zuul!" << endl;
-  cout << "You can type NORTH EAST SOUth or WEST when prompted to go into different rooms." << endl;
+  cout << endl;
+  cout << "When prompted to enter an action, here are your options:" << endl;
+  cout << "You can type NORTH EAST SOUTH or WEST to go into different rooms." << endl;
+  cout << "There are five objects around the map that you need to collect. Enter PICKUP and when prompted enter the" << endl;
+  cout << "name of the object to pick it up and store it in your inventory." << endl;
+  cout << "Enter DROP and when prompted enter the name of the object to drop it in the current room." << endl;
+  cout << "You can also enter QUIT when prompted with an action to end the game early." << endl;
+  cout << endl;
+  cout << "Here is the scenario:" << endl;
+  cout << endl;
   cout << "You walked out of school when you realized that you were missing five items from your bag!" << endl;
-  cout << "You must go back into the school, and, using the map, find the five items you are missing." << endl;
-  cout << "Remember: You cannot leave until you find all five items!" << endl;
+  cout << "You must go back into the school and, using the map, find the five items you are missing." << endl;
+  cout << "Objective: Collect all five items, and go back to the Front Entrance to leave." << endl;
+  cout << "Remember: You have to have all five items IN YOUR INVENTORY to leave!" << endl;
 
   //start at the front entrance
   Room* currentRoom = frontEntrance;
-  char * direction = new char[10];
+  char * action = new char[10];
+  vector<const char*> inventory;
 
   while (true) {
+    if (currentRoom == frontEntrance && inventory.size() == 5) {
+      cout << endl;
+      cout << "You win! You got all five items, and you may now leave the school." << endl;
+      break;
+    }
     currentRoom->printDescription();
     cout << endl;
-    cout << "Enter the direction you want to go to: ";
-    cin.getline(direction, 10);
-    Room* nextRoom = currentRoom->getExit(direction);
-    if (nextRoom != NULL) {
-      currentRoom = nextRoom;
+    cout << "Enter a direction or action: ";
+    cin.getline(action, 10);
+    if (strcmp(action, "PICKUP") == 0) {
+      //pick up the item in the current room, if there is one
+      currentRoom->pickup(inventory);
+    }
+    else if (strcmp(action, "DROP") == 0) {
+      //drop an item from the inventory into the current room, if there is one
+      currentRoom->drop(inventory);
+    }
+    else if (strcmp(action, "QUIT") == 0) {
+      //end the game early
+      break;
     }
     else {
-      cout << "You cannot go there!" << endl;
+      //action was a directiional one, or a misinput
+      Room* nextRoom = currentRoom->getExit(action);
+      if (nextRoom != NULL) {
+	currentRoom = nextRoom;
+      }
+      else {
+	cout << endl;
+	cout << "Invalid input." << endl;
+      }
     }
   }
-  
+
+  cout << endl;
+  cout << "Thanks for playing!" << endl;  
+
   return 0;
   
 }
