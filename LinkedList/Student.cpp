@@ -3,14 +3,17 @@
 
 using namespace std;
 
-Student::Student(char * name) {
-  strcpy(this->name, name);
+//constructor
+Student::Student(const char * name) {
+  this->name = name;
 }
 
+//default constructor
 Student::Student() {
-  //nothing (for now)
+  //should never be called
 }
 
+//destructor
 Student::~Student() {
   delete name;
 }
