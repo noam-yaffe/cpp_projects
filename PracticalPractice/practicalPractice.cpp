@@ -5,37 +5,24 @@ using namespace std;
 
 int main() {
 
+  int result = 1;
+  int number = 0;
   int i = 0;
-  int num = 0;
-  int current = 0;
-  int highest = 0;
-  int quit = 0;
 
-  do {
-    cout << "# of numbers you want to enter: " << endl;
-    cin >> num;
+  cout << "Enter a series of seven numbers below:" << endl;
   
-    cout << "Enter the series of numbers separated by numbers below:" << endl;
-  
-    while (i < num) {
-      cin >> current;
-      if (current > highest) {
-	highest = current;
-      }
-      i++;
+  while (i < 7) {
+    cin >> number;
+    if (number % 3 != 0 && number % 5 != 0) {
+      result = result * number;
     }
+    else {
+      //don't multiply it
+    }
+    i++;
+  }
 
-    cout << "Highest number: " << highest << endl;
-
-    cout << "Enter 1 if you want to go again, enter 2 to quit: ";
-    cin >> quit;
-
-    cin.get();
-    i = 0;
-    highest = 0;
-  } while(quit != 2);
-
-  cout << "This program is over.";
+  cout << "Result: " << result << endl;
   
   return 0;
   
