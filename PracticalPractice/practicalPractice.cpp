@@ -6,21 +6,24 @@ using namespace std;
 int main() {
 
   char * word = new char[10];
-  char c = ' ';
+  char * result = new char[10];
+  int j = 0;
   
   cout << "Enter a word: ";
   cin.getline(word, 10);
 
-  if ((word[0] == 'a' || word[0] == 'e' || word[0] == 'i' || word[0] == 'o'
-       || word[0] == 'u') && (word[1] == 'a' || word[1] == 'e' ||
-			      word[1] == 'i' || word[1] == 'o' ||
-			      word[1] == 'u')) {
-    c = word[0];
-    word[0] = word[1];
-    word[1] = c;
+  for (int i = strlen(word) - 1; i > -1; i--) {
+    if (word[i] != 'a' && word[i] != 'e' && word[i] != 'i' && word[i] != 'o'
+        && word[i] != 'u') {
+      result[j] = word[i];
+      j++;
+    }
+    else {
+      //do nothing
+    }
   }
 
-  cout << word << endl;
+  cout << result << endl;
   
   return 0;
   
