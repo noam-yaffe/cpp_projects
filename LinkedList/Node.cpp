@@ -22,17 +22,12 @@ Node::~Node() {
 
 //get next Node pointer
 Node* Node::getNext() {
-  return NULL;
-}
-
-//set student pointer
-void Node::setStudent(Student* student) {
-  this->student = student;
+  return next;
 }
 
 //get student pointer
 Student* Node::getStudent() {
-  return NULL;
+  return student;
 }
 
 //set the next pointer to the corresponding Node pointer

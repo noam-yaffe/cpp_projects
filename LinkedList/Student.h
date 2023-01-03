@@ -11,6 +11,7 @@ class Student {
  Student(const char * name);
  Student();
  ~Student();
+  const char * getName();
 };
 
 #endif

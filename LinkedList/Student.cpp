@@ -17,3 +17,7 @@ Student::Student() {
 Student::~Student() {
   delete name;
 }
+
+const char * Student::getName() {
+  return name;
+}

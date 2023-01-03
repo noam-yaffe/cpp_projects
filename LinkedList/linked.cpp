@@ -7,20 +7,17 @@ using namespace std;
 void add(Student* student);
 void print(Node* next);
 
-Node* head = NULL;
-
 int main() {
 
-  Student* noam = new Student("Noam");
-  Student* adi = new Student("Adi");
-  Student* daphna = new Student("Daphna");
+  Student* example = new Student("Example");
+  Student* example2 = new Student("Example2");
+  Node* current = new Node(example);
+  Node* next = new Node(example2);
 
-  add(noam);
-  print(head);
-  add(adi);
-  print(head);
-  add(daphna);
-  print(head);
+  current->setNext(next);
+  cout << current->getStudent()->getName() << endl;
+  current = current->getNext();
+  cout << current->getStudent()->getName() << endl;
   
   return 0;
   

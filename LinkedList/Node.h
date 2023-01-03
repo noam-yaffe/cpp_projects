@@ -6,11 +6,10 @@ using namespace std;
 
 class Node {
 public:
-  Node(Student*);
+  Node(Student* student);
   Node();
   ~Node();
   Node* getNext();
-  void setStudent(Student* student);
   Student* getStudent();
   void setNext(Node*);
 private:
