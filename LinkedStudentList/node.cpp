@@ -7,11 +7,13 @@ using namespace std;
 //constructor
 Node::Node(Student* student) {
   this->student = student;
+  next = NULL;
 }
 
 //default constructor
 Node::Node() {
   //should never be called
+  next = NULL;
 }
 
 //destructor
@@ -33,4 +35,8 @@ Student* Node::getStudent() {
 //set the next pointer to the corresponding Node pointer
 void Node::setNext(Node* next) {
   this->next = next;
+}
+
+void Node::setStudent(Student * student) {
+  this->student = student;
 }

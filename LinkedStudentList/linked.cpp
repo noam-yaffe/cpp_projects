@@ -1,26 +1,29 @@
 #include <iostream>
+#include <cstring>
 #include <iomanip>
 #include "Student.h"
 #include "Node.h"
 
 using namespace std;
 
+Node * head = NULL;
+
 Student* makeStudent();
-void add(Student* student);
+void add(Node * c, Node * p, Node * &head, Student * student);
 void print(Node* next);
 
 int main() {
 
   char input[10];
 
-   cout << "Welcome to Student Linked List! Here are the commands you can use:" << end;
+  cout << "Welcome to Student Linked List! Here are the commands you can use:" << endl;
   cout << endl;
   cout << "Type \"ADD\" to add a student." << endl;
   cout << "Type \"DELETE\" to delete a student." << endl;
   cout << "Type \"PRINT\" to print out all the students." << endl;
   cout << "Type \"QUIT\" to quit." << endl;
 
-   do {
+  do {
     //getting user input for the command
     cout << endl;
     cout << "Enter a command: ";
@@ -28,19 +31,19 @@ int main() {
     cin.get();
     //checking what the command they entered is
     if (strcmp(input, "ADD") == 0) {
-      Student * example = makeStudent();
-      Node* current = new Node(example);
-      current->getStudent()->getDescription();
-      //add();
+      Student * student = makeStudent();
+      cout << endl;
+      add(head, head, head, student);
+      cout << "Student has been added!" << endl;
     }
     else if (strcmp(input, "DELETE") == 0) {
       cout << "Enter the ID of the student you want to remove: ";
-      cin >> idToDelete;
+      //cin >> idToDelete;
       cin.get();
       //del(students, idToDelete);
     }
     else if (strcmp(input, "PRINT") == 0) {
-      //print(students);
+      print(head);
     }
     else if (strcmp(input, "QUIT") == 0) {
       cout << endl;
@@ -52,15 +55,15 @@ int main() {
     }
   } while (strcmp(input, "QUIT") != 0);//only end the program here
   
-   //Student* example = new Student("Example", 472202, 4.00);
-  Student* example2 = new Student("Example2", 472393, 3.50);
+  //Student* example = new Student("Example", 472202, 4.00);
+  //Student* example2 = new Student("Example2", 472393, 3.50);
   //Node* current = new Node(example);
-  Node* next = new Node(example2);
+  //Node* next = new Node(example2);
 
-  current->setNext(next);
-  current->getStudent()->getDescription();
-  current = current->getNext();
-  current->getStudent()->getDescription();
+  //current->setNext(next);
+  //current->getStudent()->getDescription();
+  //current = current->getNext();
+  //current->getStudent()->getDescription();
   
   return 0;
   
@@ -68,26 +71,62 @@ int main() {
 
 Student* makeStudent() {
 
-  char name[20];
+  char * name = new char[20];
   int id;
-  float gpa;
-  
-  cout << "Enter the name of the student (first and last):";
-  cin.get(name, 20);
+  double gpa;
+
+  cout << endl;
+  cout << "Enter the name of the student (first and last): ";
+  cin.getline(name, 20);
   cout << "Enter the student's ID: ";
   cin >> id;
   cout << "Enter the student's GPA: ";
   cin >> gpa;
-
+  cin.get();
+  
   Student* student  = new Student(name, id, gpa);
   return student;
   
 }
 
-void add(Student* student) {
+void add(Node * c, Node * p, Node * &head, Student * student) {
+
+  if (head == NULL) {
+    head = new Node(student);
+    return;
+  }
+  else if (student->id < head->getStudent()->id) {
+    Node * newN = new Node(student);
+    newN->setNext(head);
+    head = newN;
+    return;
+  }
+  else if (student->id < c->getStudent()->id) {
+    Node * newN = new Node(student);
+    p->setNext(newN);
+    newN->setNext(c);
+    return;
+  }
+  if (c->getNext() == NULL) {
+    Node * newN = new Node(student);
+    c->setNext(newN);
+    newN->setNext(NULL);
+    return;
+  }
+  add(c->getNext(), c, head, student);
   
 }
 
 void print(Node* next) {
-
+  
+  if (next == head) {
+    cout << endl;
+    cout << "Students currently in the list:" << endl;
+  }
+  if (next != NULL) {
+    cout << endl;
+    next->getStudent()->getDescription();
+    print(next->getNext());
+  }
+  
 }

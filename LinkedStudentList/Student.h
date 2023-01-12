@@ -9,8 +9,8 @@ class Student {
  public:
   const char * name = new char[20];
   int id;
-  float gpa;
-  Student(char name[20], int id, float gpa);
+  double gpa;
+  Student(char * name, int id, double gpa);
  Student();
  ~Student();
  void getDescription();
