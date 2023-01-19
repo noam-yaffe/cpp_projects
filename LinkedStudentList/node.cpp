@@ -4,39 +4,36 @@
 
 using namespace std;
 
-//constructor
-Node::Node(Student* student) {
+Node::Node(Student * student){
   this->student = student;
   next = NULL;
 }
 
-//default constructor
 Node::Node() {
-  //should never be called
-  next = NULL;
+  student = NULL;
 }
 
-//destructor
-Node::~Node() {
+Node::~Node(){
   delete student;
   next = NULL;
 }
 
-//get next Node pointer
-Node* Node::getNext() {
-  return next;
+//Sets the value of the node to a student
+void Node::setStudent(Student * student){
+  this->student = student;
 }
 
-//get student pointer
-Student* Node::getStudent() {
+//Returns the value of a student found in a node
+Student* Node::getStudent(){
   return student;
 }
 
-//set the next pointer to the corresponding Node pointer
-void Node::setNext(Node* next) {
+//Sets the next node
+void Node::setNext(Node* next){
   this->next = next;
 }
 
-void Node::setStudent(Student * student) {
-  this->student = student;
+//Returns the next node (end of list if NULL)
+Node* Node::getNext(){
+  return next;
 }

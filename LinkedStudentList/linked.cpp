@@ -55,16 +55,6 @@ int main() {
     }
   } while (strcmp(input, "QUIT") != 0);//only end the program here
   
-  //Student* example = new Student("Example", 472202, 4.00);
-  //Student* example2 = new Student("Example2", 472393, 3.50);
-  //Node* current = new Node(example);
-  //Node* next = new Node(example2);
-
-  //current->setNext(next);
-  //current->getStudent()->getDescription();
-  //current = current->getNext();
-  //current->getStudent()->getDescription();
-  
   return 0;
   
 }

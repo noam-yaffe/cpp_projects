@@ -1,19 +1,21 @@
 #include <iostream>
-#include <cstring>
 #include "Student.h"
 
 using namespace std;
 
-class Node {
-public:
+class Node{
+ public:
   Node(Student* student);
   Node();
   ~Node();
-  Node* getNext();
-  Student* getStudent();
-  void setNext(Node*);
-  void setStudent(Student * student);
-private:
+  void setStudent(Student * student); //Sets the value of a node to a student
+  Student* getStudent(); //Returns the value of a student found in a node
+  void setNext(Node* next); //Sets the next node
+  Node* getNext(); //Returns the next node(end of list if NULL)
+
+ private:
+  //Node values:
   Student* student;
   Node* next;
 };
+
