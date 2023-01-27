@@ -74,7 +74,6 @@ int main() {
       }
       else {
 	num = getCount(head);
-	cout << "Number of students in the list: " << num << endl;
 	average(head, num, 0);
       }
     }
@@ -192,6 +191,7 @@ int getCount(Node * head) {
     if (current->next == NULL) {
       return counter;
     }
+    current = current->next;
   }
 
   return 0;
@@ -209,6 +209,7 @@ void average(Node * next, int number, double avg) {
   }
   else {
     avg = avg / number;
+    cout << endl;
     cout << "Average GPA of students: " << avg << endl;
   }
   
