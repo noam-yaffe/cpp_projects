@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <iomanip>
+#include <cstdlib>
 #include "student.h"
 #include "node.h"
 
@@ -12,21 +13,27 @@ Student* makeStudent();
 void add(Node * c, Node * p, Node * &head, Student * student);
 void print(Node* next);
 void del(Node * &head, int idToDelete);
-int getCount(Node * head);
-void average(Node * next, int number, double avg);
 
 int main() {
 
   char input[10];
   int idToDelete = 0;
   int num = 0;
+  int size = 100;
+
+  Node ** ht = new Node*[size];
+
+  //random id generator code
+  srand((unsigned) time(NULL));
+  int randomID = ((rand() % 999999) + 1) % size;
+  
+  cout << randomID << endl;
   
   cout << "Welcome to Student Linked List! Here are the commands you can use:" << endl;
   cout << endl;
   cout << "Type \"ADD\" to add a student." << endl;
   cout << "Type \"DELETE\" to delete a student." << endl;
   cout << "Type \"PRINT\" to print out all the students." << endl;
-  cout << "Type \"AVERAGE\" to average out all GPA's of the students' GPAs." << endl;
   cout << "Type \"QUIT\" to quit." << endl;
 
   do {
@@ -67,16 +74,6 @@ int main() {
       cout << "This program has ended." << endl;
       delete head;
     }
-    else if (strcmp(input, "AVERAGE") == 0) {
-      if (head == NULL) {
-	cout << endl;
-	cout << "There are no students currently in the list." << endl;
-      }
-      else {
-	num = getCount(head);
-	average(head, num, 0);
-      }
-    }
     //if the user didn't enter a valid command
     else {
       cout << "You didn't enter a valid command!" << endl;
@@ -89,20 +86,23 @@ int main() {
 
 Student* makeStudent() {
 
-  char * name = new char[20];
+  char * first = new char[20];
+  char * last = new char[20];
   int id;
   double gpa;
 
   cout << endl;
-  cout << "Enter the name of the student (first and last): ";
-  cin.getline(name, 20);
+  cout << "Enter the student's first name: ";
+  cin.getline(first, 20);
+  cout << "Enter the student's last name: ";
+  cin.getline(last, 20);
   cout << "Enter the student's ID: ";
   cin >> id;
   cout << "Enter the student's GPA: ";
   cin >> gpa;
   cin.get();
   
-  Student* student  = new Student(name, id, gpa);
+  Student* student  = new Student(first, last, id, gpa);
   return student;
   
 }
@@ -178,39 +178,5 @@ void del(Node * &head, int idToDelete) {
 
   cout << endl;
   cout << "Student successfully deleted!" << endl;
-  
-}
-
-int getCount(Node * head) {
-
-  int counter = 0;
-  Node * current = head;
-  
-  while (current != NULL) {
-    counter++;
-    if (current->next == NULL) {
-      return counter;
-    }
-    current = current->next;
-  }
-
-  return 0;
-  
-}
-
-void average(Node * next, int number, double avg) {
-  
-  if (next == head) {
-    //do nothing
-  }
-  if (next != NULL) {
-    avg += next->student->gpa;
-    average(next->getNext(), number, avg);
-  }
-  else {
-    avg = avg / number;
-    cout << endl;
-    cout << "Average GPA of students: " << avg << endl;
-  }
   
 }

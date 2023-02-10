@@ -6,8 +6,9 @@
 using namespace std;
 
 //constructor
-Student::Student(char * name, int id, double gpa) {
-  this->name = name;
+Student::Student(char * firstName, char * lastName, int id, double gpa) {
+  this->firstName = firstName;
+  this->lastName = lastName;
   this->id = id;
   this->gpa = gpa;
 }
@@ -19,11 +20,12 @@ Student::Student() {
 
 //destructor
 Student::~Student() {
-  delete name;
+  delete firstName;
+  delete lastName;
 }
 
 void Student::getDescription() {
-  cout << "Name: " << name << endl;
+  cout << "Name: " << firstName << " " << lastName << endl;
   cout << "ID: " << id << endl;
   cout << "GPA: " << fixed << setprecision(2) << gpa << endl;
 }
