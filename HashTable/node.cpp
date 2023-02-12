@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Node.h"
-#include "Student.h"
+#include "node.h"
+#include "student.h"
 
 using namespace std;
 
