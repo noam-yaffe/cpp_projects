@@ -2,6 +2,8 @@
 #include <cstring>
 #include <iomanip>
 #include <cstdlib>
+#include <fstream>
+#include <vector>
 #include "student.h"
 #include "node.h"
 
@@ -9,9 +11,13 @@ using namespace std;
 
 Node * head = NULL;
 
-Student* makeStudent();
-void add(Node * c, Node * p, Node * &head, Student * student);
-void print(Node* next);
+Student * makeStudent();
+void generateDefaultTable(Node ** &table, int size);
+//void generateNewTable();
+//void checkCollisions();
+void add(Node ** &table, Student * student, int index);
+void printTable(Node ** table, int size);
+void printChain(Node * current, Node * next, int index);
 void del(Node * &head, int idToDelete);
 
 int main() {
@@ -20,16 +26,14 @@ int main() {
   int idToDelete = 0;
   int num = 0;
   int size = 100;
-
   Node ** ht = new Node*[size];
 
-  //random id generator code
-  srand((unsigned) time(NULL));
-  int randomID = ((rand() % 999999) + 1) % size;
+  generateDefaultTable(ht, size);
+  printTable(ht, size);
+
+  cout << endl;
   
-  cout << randomID << endl;
-  
-  cout << "Welcome to Student Linked List! Here are the commands you can use:" << endl;
+  cout << "Welcome to Student Hash Table! Here are the commands you can use:" << endl;
   cout << endl;
   cout << "Type \"ADD\" to add a student." << endl;
   cout << "Type \"DELETE\" to delete a student." << endl;
@@ -46,7 +50,7 @@ int main() {
     if (strcmp(input, "ADD") == 0) {
       Student * student = makeStudent();
       cout << endl;
-      add(head, head, head, student);
+      add(ht, student, student->id % size);
       cout << "Student has been added!" << endl;
     }
     else if (strcmp(input, "DELETE") == 0) {
@@ -61,13 +65,7 @@ int main() {
       }
     }
     else if (strcmp(input, "PRINT") == 0) {
-      if (head == NULL) {
-	cout << endl;
-	cout << "There are no students currently in the list." << endl;
-      }
-      else {
-	print(head);
-      }
+      printTable(ht, size);
     }
     else if (strcmp(input, "QUIT") == 0) {
       cout << endl;
@@ -86,65 +84,143 @@ int main() {
 
 Student* makeStudent() {
 
-  char * first = new char[20];
-  char * last = new char[20];
+  char * fname = new char[20];
+  char * lname = new char[20];
   int id;
   double gpa;
 
   cout << endl;
   cout << "Enter the student's first name: ";
-  cin.getline(first, 20);
+  cin.getline(fname, 20);
   cout << "Enter the student's last name: ";
-  cin.getline(last, 20);
+  cin.getline(lname, 20);
   cout << "Enter the student's ID: ";
   cin >> id;
   cout << "Enter the student's GPA: ";
   cin >> gpa;
   cin.get();
   
-  Student* student  = new Student(first, last, id, gpa);
+  Student* student  = new Student(fname, lname, id, gpa);
   return student;
   
 }
 
-void add(Node * c, Node * p, Node * &head, Student * student) {
+//void generateNewTable(Node ** &newTable, Node ** &oldTable, int size) {}
 
-  if (head == NULL) {
-    head = new Node(student);
-    return;
+//generates the default table which the program starts out with
+void generateDefaultTable(Node ** &table, int size) {
+
+  ifstream first_names("first_names.txt");
+  ifstream last_names("last_names.txt");
+  srand(time(NULL));
+  int randomID = 0;
+  double randomGPA = 0;
+  int index = 0;
+  int counter = 0;
+
+  for (int i = 0; i < size; i++) {
+    table[i] = NULL;
   }
-  else if (student->id < head->getStudent()->id) {
-    Node * newN = new Node(student);
-    newN->setNext(head);
-    head = newN;
-    return;
+
+  vector<char*> fnames;
+  vector<char*> lnames;
+  while (!first_names.eof() && ! last_names.eof()) {
+    char * fname = new char[20];
+    first_names >> fname;
+    fnames.push_back(fname);
+    char * lname = new char[20];
+    last_names >> lname;
+    lnames.push_back(lname);
   }
-  else if (student->id < c->getStudent()->id) {
-    Node * newN = new Node(student);
-    p->setNext(newN);
-    newN->setNext(c);
-    return;
+
+  int randomIndex = 0;
+  
+  while (counter != 20) {
+    char * first = new char[20];
+    char * last = new char[20];
+    randomIndex = (rand() % 99) + 1;
+    first = fnames.at(randomIndex);
+    randomIndex = (rand() % 99) + 1;
+    last = lnames.at(randomIndex);
+    randomID  =((rand() % 999999) + 1);
+    index = randomID % size;
+    randomGPA = static_cast<double>(rand()) / RAND_MAX * 3.0 + 1;
+    Student * student = new Student(first, last, randomID, randomGPA);
+    Node * newNode = new Node(student);
+   
+    bool done = false;
+    
+    if (table[index] != NULL) {
+      Node * current = table[index];
+      while (!done) {
+	if (current->next == NULL) {
+	  current->next = newNode;
+	  newNode->next = NULL;
+	  done = true;
+	}
+	else {
+	  current = current->next;
+	}
+      }
+    }
+    else {
+      table[index] = newNode;
+      newNode->next = NULL;
+    }
+    counter++;
   }
-  if (c->getNext() == NULL) {
-    Node * newN = new Node(student);
-    c->setNext(newN);
-    newN->setNext(NULL);
-    return;
+   
+}
+ 
+void add(Node ** &table, Student * student, int index) {
+
+  bool done = false;
+  Node * newNode = new Node(student);
+  
+  if (table[index] != NULL) {
+    Node * current = table[index];
+    while (!done) {
+      if (current->next == NULL) {
+	current->next = newNode;
+	newNode->next = NULL;
+	done = true;
+      }
+      else {
+	current = current->next;
+      }
+    }
   }
-  add(c->getNext(), c, head, student);
+  else {
+    table[index] = newNode;
+    newNode->next = NULL;
+  }
+
+}
+
+void printTable(Node ** table, int size) {
+
+  for (int i = 0; i < size; i++) {
+    if (table[i] != NULL) {
+      printChain(table[i], table[i], i);
+    }
+    else {
+      cout << endl;
+      cout << "There are no students in row " << i << endl;
+    }
+  }
   
 }
 
-void print(Node* next) {
+void printChain(Node * current, Node* next, int index) {
   
-  if (next == head) {
+  if (next == current) {
     cout << endl;
-    cout << "Students currently in the list:" << endl;
+    cout << "Students in row " << index << ":" << endl;
   }
   if (next != NULL) {
     cout << endl;
     next->getStudent()->getDescription();
-    print(next->getNext());
+    printChain(current, next->getNext(), index);
   }
   
 }
