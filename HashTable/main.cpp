@@ -9,16 +9,14 @@
 
 using namespace std;
 
-Node * head = NULL;
-
 Student * makeStudent();
-void generateDefaultTable(Node ** &table, int size);
-//void generateNewTable();
-//void checkCollisions();
+void generateTable(Node ** &table, int size);
+void rehashTable(Node ** &table, int size);
+bool checkCollisions(Node ** &table, int size);
 void add(Node ** &table, Student * student, int index);
 void printTable(Node ** table, int size);
 void printChain(Node * current, Node * next, int index);
-void del(Node * &head, int idToDelete);
+void del(Node ** &table, int idToDelete, int size);
 
 int main() {
 
@@ -28,7 +26,7 @@ int main() {
   int size = 100;
   Node ** ht = new Node*[size];
 
-  generateDefaultTable(ht, size);
+  generateTable(ht, size);
   printTable(ht, size);
 
   cout << endl;
@@ -41,6 +39,13 @@ int main() {
   cout << "Type \"QUIT\" to quit." << endl;
 
   do {
+    if (checkCollisions(ht, size)) {
+      //rehash table
+      cout << endl;
+      cout << "Table needs to be rehashed!" << endl;
+      size = size * 2;
+      rehashTable(ht, size);
+    }
     //getting user input for the command
     cout << endl;
     cout << "Enter a command: ";
@@ -54,15 +59,10 @@ int main() {
       cout << "Student has been added!" << endl;
     }
     else if (strcmp(input, "DELETE") == 0) {
-      if (head == NULL) {
-	cout << "nothing to delete" << endl;
-      }
-      else {
 	cout << "Enter the ID of the student you want to remove: ";
         cin >> idToDelete;
         cin.get();
-        del(head, idToDelete);
-      }
+        del(ht, idToDelete, size);
     }
     else if (strcmp(input, "PRINT") == 0) {
       printTable(ht, size);
@@ -108,7 +108,7 @@ Student* makeStudent() {
 //void generateNewTable(Node ** &newTable, Node ** &oldTable, int size) {}
 
 //generates the default table which the program starts out with
-void generateDefaultTable(Node ** &table, int size) {
+void generateTable(Node ** &table, int size) {
 
   ifstream first_names("first_names.txt");
   ifstream last_names("last_names.txt");
@@ -171,7 +171,43 @@ void generateDefaultTable(Node ** &table, int size) {
   }
    
 }
- 
+
+void rehashTable(Node ** &table, int size) {
+
+  Node ** newTable = new Node*[size];
+  int index = 0;
+  
+  for (int i = 0; i < size; i++) {
+    if (table[i] != NULL) {
+      
+    }
+  }
+
+}
+
+bool checkCollisions(Node ** &table, int size) {
+
+  int counter = 0;
+  
+  for (int i = 0; i < size; i++) {
+    if (table[i] != NULL) {
+      Node * current = table[i];
+      while (current != NULL) {
+	counter++;
+	current = current->next;
+      }
+      if (counter > 3) {
+	//we need to rehash!
+	return true;
+      }
+    }
+    counter = 0;
+  }
+
+  return false;
+  
+}
+
 void add(Node ** &table, Student * student, int index) {
 
   bool done = false;
@@ -204,8 +240,7 @@ void printTable(Node ** table, int size) {
       printChain(table[i], table[i], i);
     }
     else {
-      cout << endl;
-      cout << "There are no students in row " << i << endl;
+      //do nothing
     }
   }
   
@@ -215,7 +250,7 @@ void printChain(Node * current, Node* next, int index) {
   
   if (next == current) {
     cout << endl;
-    cout << "Students in row " << index << ":" << endl;
+    cout << "Student(s) in row " << index << ":" << endl;
   }
   if (next != NULL) {
     cout << endl;
@@ -225,25 +260,30 @@ void printChain(Node * current, Node* next, int index) {
   
 }
 
-void del(Node * &head, int idToDelete) {
+void del(Node ** &table, int idToDelete, int size) {
 
-  Node * current = head;
+  int i = idToDelete % size;
+
+  Node * current = table[i];
   Node * previous = current;
   int counter = 0;
+  bool deleted = false;
   
   while (current != NULL) {
     if (current->student->id == idToDelete && counter == 0) {
       Node * headRemover = current;
       previous = current->next;
       current = current->next;
-      head = current;
+      table[i] = current;
       delete headRemover;
+      deleted = true;
     }
     else if (current->student->id == idToDelete) {
       Node * temp = current;
       previous->next = current->next;
       current = current->next;
       delete temp;
+      deleted = true;
     }
     else {
       previous = current;
@@ -252,7 +292,13 @@ void del(Node * &head, int idToDelete) {
     counter++;
   }
 
-  cout << endl;
-  cout << "Student successfully deleted!" << endl;
+  if (deleted) {
+    cout << endl;
+    cout << "Student successfully deleted!" << endl;
+  }
+  else {
+    cout << endl;
+    cout << "No student matches the entered ID" << endl;
+  }
   
 }
