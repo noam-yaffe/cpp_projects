@@ -70,7 +70,6 @@ int main() {
     else if (strcmp(input, "QUIT") == 0) {
       cout << endl;
       cout << "This program has ended." << endl;
-      delete head;
     }
     //if the user didn't enter a valid command
     else {
@@ -175,14 +174,30 @@ void generateTable(Node ** &table, int size) {
 void rehashTable(Node ** &table, int size) {
 
   Node ** newTable = new Node*[size];
+
+  for (int i = 0; i < size; i++) {
+    table[i] = NULL;
+  }
+  
   int index = 0;
   
   for (int i = 0; i < size; i++) {
     if (table[i] != NULL) {
-      
+      Node * current = table[i];
+      while (current != NULL) {
+	index = current->getStudent()->id % size;
+	add(newTable, current->getStudent(), index);
+	current = current->next;
+      }
     }
   }
 
+  cout << endl;
+  cout << "Table has been rehashed!" << endl;
+  printTable(table, 100);
+  printTable(newTable, size);
+  table = newTable;
+  
 }
 
 bool checkCollisions(Node ** &table, int size) {
