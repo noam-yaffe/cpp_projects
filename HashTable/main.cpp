@@ -1,3 +1,9 @@
+/*
+ * Author: Noam Yaffe
+ * This program uses a hash table to contain both random and user-entered         student data
+ * Date: 2/17/2023
+ */
+
 #include <iostream>
 #include <cstring>
 #include <iomanip>
@@ -27,10 +33,10 @@ int main() {
   Node ** ht = new Node*[size];
 
   generateTable(ht, size);
-  printTable(ht, size);
 
   cout << endl;
-  
+
+  //instructions
   cout << "Welcome to Student Hash Table! Here are the commands you can use:" << endl;
   cout << endl;
   cout << "Type \"ADD\" to add a student." << endl;
@@ -42,7 +48,6 @@ int main() {
     if (checkCollisions(ht, size)) {
       //rehash table
       cout << endl;
-      cout << "Table needs to be rehashed!" << endl;
       size = size * 2;
       rehashTable(ht, size);
     }
@@ -58,15 +63,18 @@ int main() {
       add(ht, student, student->id % size);
       cout << "Student has been added!" << endl;
     }
+    //delete a specific student using their ID number
     else if (strcmp(input, "DELETE") == 0) {
 	cout << "Enter the ID of the student you want to remove: ";
         cin >> idToDelete;
         cin.get();
         del(ht, idToDelete, size);
     }
+    //print out the table
     else if (strcmp(input, "PRINT") == 0) {
       printTable(ht, size);
     }
+    //quit the program
     else if (strcmp(input, "QUIT") == 0) {
       cout << endl;
       cout << "This program has ended." << endl;
@@ -81,6 +89,7 @@ int main() {
   
 }
 
+//creates a student
 Student* makeStudent() {
 
   char * fname = new char[20];
@@ -103,8 +112,6 @@ Student* makeStudent() {
   return student;
   
 }
-
-//void generateNewTable(Node ** &newTable, Node ** &oldTable, int size) {}
 
 //generates the default table which the program starts out with
 void generateTable(Node ** &table, int size) {
@@ -171,17 +178,18 @@ void generateTable(Node ** &table, int size) {
    
 }
 
+//if a chain has more than 3 nodes in it, this rehashes the table
 void rehashTable(Node ** &table, int size) {
 
   Node ** newTable = new Node*[size];
 
   for (int i = 0; i < size; i++) {
-    table[i] = NULL;
+    newTable[i] = NULL;
   }
   
   int index = 0;
   
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size / 2; i++) {
     if (table[i] != NULL) {
       Node * current = table[i];
       while (current != NULL) {
@@ -192,14 +200,12 @@ void rehashTable(Node ** &table, int size) {
     }
   }
 
-  cout << endl;
-  cout << "Table has been rehashed!" << endl;
-  printTable(table, 100);
-  printTable(newTable, size);
+  delete [] table;
   table = newTable;
   
 }
 
+//check if there were any collisions during the user's last input
 bool checkCollisions(Node ** &table, int size) {
 
   int counter = 0;
@@ -223,6 +229,7 @@ bool checkCollisions(Node ** &table, int size) {
   
 }
 
+//add a student to the table
 void add(Node ** &table, Student * student, int index) {
 
   bool done = false;
@@ -248,6 +255,7 @@ void add(Node ** &table, Student * student, int index) {
 
 }
 
+//print out the table
 void printTable(Node ** table, int size) {
 
   for (int i = 0; i < size; i++) {
@@ -261,6 +269,7 @@ void printTable(Node ** table, int size) {
   
 }
 
+//print out each chain linked to the specific index
 void printChain(Node * current, Node* next, int index) {
   
   if (next == current) {
@@ -275,6 +284,7 @@ void printChain(Node * current, Node* next, int index) {
   
 }
 
+//delete a student by ID number
 void del(Node ** &table, int idToDelete, int size) {
 
   int i = idToDelete % size;
