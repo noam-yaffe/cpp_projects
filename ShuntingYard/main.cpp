@@ -4,6 +4,8 @@
 
 using namespace std;
 
+int checkPrecedence(char c);
+
 struct Stack {
 
   Node * head = NULL;
@@ -29,7 +31,7 @@ struct Stack {
   }
 
   //look into the head of the stack
-  char peak() {
+  char peek() {
     if (head == NULL) {
       return '\0';
     }
@@ -92,8 +94,8 @@ struct Queue {
 int main() {
 
   char * equation = new char[30];
-  Stack stack;
-  Queue queue;
+  Stack operators;
+  Queue output;
   
   cout << endl;
   cout << "Welcome to the Shunting Yard Algorithm!" << endl;
@@ -108,17 +110,72 @@ int main() {
     }
     if (isdigit(equation[i]) == 1) {
       //integer, push into QUEUE
-      queue.enqueue(equation[i]);
+      output.enqueue(equation[i]);
     }
     else {
-      //mathematical symbol, check precedence, and push into STACK
-      stack.push(equation[i]);
+      char input = equation[i];
+      int ip = checkPrecedence(input);
+      //mathematical symbol
+      if (input == '(') {
+	//left parenthesis
+	operators.push(input);
+      }
+      else if (input == ')') {
+	//right parenthesis
+	char top = operators.peek();
+	while (top != '\0' && top != '(') {
+	  operators.pop();
+	  output.enqueue(top);
+	  top = operators.peek();
+	}
+	if (top == '(') {
+	  operators.pop();
+	}
+      }
+      else {
+	char top = operators.peek();
+	int tp = checkPrecedence(top);
+	//any other mathematical symbol
+	while (top != '\0' && top != '(' && (tp > ip || (tp == ip && input != '^'))) {
+	  operators.pop();
+	  output.enqueue(top);
+	  top = operators.peek();
+	  tp = checkPrecedence(top);
+	}
+	operators.push(input);
+      }
     }
+    //operators.print();
   }
 
-  queue.print();
-  stack.print();
+  while (operators.peek() != '\0') {
+    output.enqueue(operators.peek());
+    operators.pop();
+  }
+  
+  output.print();
+  operators.print();
   
   return 0;
+  
+}
+
+int checkPrecedence(char c) {
+
+  if (c == '+' || c == '-') {
+    return 1;
+  }
+  else if (c == '*' || c == '/') {
+    return 2;
+  }
+  else if (c == '^') {
+    return 3;
+  }
+  else if (c == '(' || c == ')') {
+    return 4;
+  }
+  else {//probably a null value
+    return 0;
+  }
   
 }
