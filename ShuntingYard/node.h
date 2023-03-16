@@ -10,5 +10,6 @@ class Node{
   char symbol;
   Node(Node * left, Node * right, Node * next, char symbol);
   Node(char symbol);
+  Node(Node * left, Node * right, char symbol);
   Node();
 };

@@ -67,18 +67,21 @@ struct Queue {
   }
 
   //remove the head of the queue and return its symbol
-  char dequeue() {
+  void dequeue() {
     if (head == NULL) {
-      cout << endl;
-      cout << "Queue is empty." << endl;
-      return '\0';
+      return;
     }
     Node * temp;
     temp = head;
     head = head->next;
-    char c = temp->symbol;
     delete temp;
-    return c;
+  }
+
+  char peek() {
+    if (head == NULL) {
+      return '\0';
+    }
+    return head->symbol;
   }
 
   void print() {
@@ -91,11 +94,39 @@ struct Queue {
 
 };
 
+struct TreeStack {
+
+  Node * head = NULL;
+  Node * root = NULL;
+  Node * left = NULL;
+  Node * right = NULL;  
+
+  void push(char c) {
+    Node * newNode = new Node(c);
+    if (head == NULL) {
+      head = newNode;
+      return;
+    }
+    else if (isDigit(c)) {
+      newNode->next = head;
+      head = newNode;
+      delete temp;
+    }
+    //continue here... handle symbols, add dequeue method, and make the tree
+  }
+
+  Node * getRoot() {
+    return root;
+  }
+  
+};
+
 int main() {
 
   char * equation = new char[30];
   Stack operators;
   Queue output;
+  TreeStack tree;
   
   cout << endl;
   cout << "Welcome to the Shunting Yard Algorithm!" << endl;
@@ -108,7 +139,7 @@ int main() {
     if (equation[i] == ' ') {
       //space, do nothing
     }
-    if (isdigit(equation[i]) == 1) {
+    else if (isdigit(equation[i]) == 1) {
       //integer, push into QUEUE
       output.enqueue(equation[i]);
     }
@@ -145,13 +176,15 @@ int main() {
 	operators.push(input);
       }
     }
-    //operators.print();
   }
 
   while (operators.peek() != '\0') {
     output.enqueue(operators.peek());
     operators.pop();
   }
+
+  Node * root = new Node(NULL, NULL, '\0');
+  makeTree(output, tree);
   
   output.print();
   operators.print();
@@ -178,4 +211,21 @@ int checkPrecedence(char c) {
     return 0;
   }
   
+}
+
+void makeTree(Queue output, TreeStack &tree) {
+
+  char c = output.peek();
+  
+  while (c != '\0') {
+    if (isDigit(c)) {
+      //is a digit
+      tree.push(c);
+    }
+    else {
+      //is a mathematical symbol
+    }
+    c = output.peek();
+  }
+
 }

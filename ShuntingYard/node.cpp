@@ -19,6 +19,13 @@ Node::Node(char symbol) {
   next = NULL;
 }
 
+//tree node constructor
+Node::Node(Node * left, Node * right, char symbol) {
+  this->left = left;
+  this->right = right;
+  this->symbol = symbol;
+}
+
 //default constructor
 Node::Node() {
   left = NULL;
