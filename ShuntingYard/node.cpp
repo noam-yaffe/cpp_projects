@@ -19,11 +19,21 @@ Node::Node(char symbol) {
   next = NULL;
 }
 
+Node::Node(Node * treeNode) {
+  this->treeNode = treeNode;
+  left = NULL;
+  right = NULL;
+  next = NULL;
+  symbol = '\0';
+}
+
 //tree node constructor
 Node::Node(Node * left, Node * right, char symbol) {
   this->left = left;
   this->right = right;
+  this->treeNode = NULL;
   this->symbol = symbol;
+  next = NULL;
 }
 
 //default constructor

@@ -13,6 +13,10 @@ struct Stack {
   //insert node into the stack
   void push(char c) {
     Node * newNode = new Node(c);
+    if (head == NULL) {
+      head = newNode;
+      return;
+    }
     newNode->next = head;
     head = newNode;
   }
@@ -20,8 +24,6 @@ struct Stack {
   //remove the head of the stack
   void pop() {
     if (head == NULL) {
-      cout << endl;
-      cout << "Stack is empty" << endl;
       return;
     }
     Node * temp;
@@ -38,16 +40,59 @@ struct Stack {
     return head->symbol;
   }
 
+  Node * peekNode() {
+    return head;
+  }
+
   void print() {
     Node * current = head;
-    cout << endl;
+    //cout << endl;
     while (current != NULL) {
       cout << current->symbol;
       current = current->next;
     }
+    cout << endl;
   }
 
 };
+
+
+struct TreeStack {
+
+  Node * head = NULL;
+
+  //insert node into the stack
+  void push(Node * n) {
+    Node * newNode = new Node(n);
+    if (head == NULL) {
+      head = newNode;
+      return;
+    }
+    newNode->next = head;
+    head = newNode;
+  }
+
+  //remove the head of the stack
+  void pop() {
+    if (head == NULL) {
+      return;
+    }
+    Node * temp;
+    temp = head;
+    head = head->next;
+    delete temp;
+  }
+
+  //look into the head of the stack
+  Node * peek() {
+    if (head == NULL) {
+      return NULL;
+    }
+    return head->treeNode;
+  }
+
+};
+
 
 struct Queue {
 
@@ -90,43 +135,19 @@ struct Queue {
       cout << current->symbol;
       current = current->next;
     }
+    cout << endl;
   }
 
 };
 
-struct TreeStack {
-
-  Node * head = NULL;
-  Node * root = NULL;
-  Node * left = NULL;
-  Node * right = NULL;  
-
-  void push(char c) {
-    Node * newNode = new Node(c);
-    if (head == NULL) {
-      head = newNode;
-      return;
-    }
-    else if (isDigit(c)) {
-      newNode->next = head;
-      head = newNode;
-      delete temp;
-    }
-    //continue here... handle symbols, add dequeue method, and make the tree
-  }
-
-  Node * getRoot() {
-    return root;
-  }
-  
-};
+Node * makeTree(Queue output);
+void printInOrder(Node * current, int layer);
 
 int main() {
 
   char * equation = new char[30];
   Stack operators;
   Queue output;
-  TreeStack tree;
   
   cout << endl;
   cout << "Welcome to the Shunting Yard Algorithm!" << endl;
@@ -183,11 +204,15 @@ int main() {
     operators.pop();
   }
 
-  Node * root = new Node(NULL, NULL, '\0');
-  makeTree(output, tree);
-  
   output.print();
-  operators.print();
+  //operators.print();
+
+  Node * root = makeTree(output);
+  cout << "root: " << root->symbol << endl;
+  cout << "left: " << root->left->symbol << endl;
+  cout << "right: " << root->right->symbol << endl;
+  cout << endl;
+  printInOrder(root, 0);
   
   return 0;
   
@@ -213,19 +238,45 @@ int checkPrecedence(char c) {
   
 }
 
-void makeTree(Queue output, TreeStack &tree) {
-
-  char c = output.peek();
-  
-  while (c != '\0') {
-    if (isDigit(c)) {
-      //is a digit
-      tree.push(c);
+Node * makeTree(Queue output) {
+  char symbol = output.peek();
+  TreeStack treeStack;
+  while (symbol != '\0') {
+    if (isdigit(symbol)) {
+      Node * treeNode = new Node(symbol);
+      treeStack.push(treeNode);
     }
     else {
-      //is a mathematical symbol
+      // Symbol is an operator
+      Node * rightChild = treeStack.peek();
+      treeStack.pop();
+      Node * leftChild = treeStack.peek();
+      treeStack.pop();
+      Node * operatorNode = new Node(leftChild, rightChild, symbol);
+      treeStack.push(operatorNode);
     }
-    c = output.peek();
+    output.dequeue();
+    symbol = output.peek();
+  }
+  // When we're done, we are left with a single node in treeStack
+  // which is the tree root
+  Node * root = treeStack.peek();
+  return root;
+}
+
+void printInOrder(Node * current, int layer) {
+
+  if (current == NULL) {
+    return;
   }
 
+  printInOrder(current->right, layer + 1);
+
+  for (int i = 0; i < layer; i++) {
+    cout << "    ";
+  }
+  cout << current->symbol << endl;
+
+  printInOrder(current->left, layer + 1);
+  
 }
