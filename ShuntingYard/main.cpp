@@ -141,11 +141,15 @@ struct Queue {
 };
 
 Node * makeTree(Queue output);
-void printInOrder(Node * current, int layer);
+void printExpressionTree(Node * current, int layer);
+void infix(Node * current);
+void prefix(Node * current);
+void postfix(Node * current);
 
 int main() {
 
   char * equation = new char[30];
+  char * input = new char[20];
   Stack operators;
   Queue output;
   
@@ -208,11 +212,26 @@ int main() {
   //operators.print();
 
   Node * root = makeTree(output);
-  cout << "root: " << root->symbol << endl;
-  cout << "left: " << root->left->symbol << endl;
-  cout << "right: " << root->right->symbol << endl;
   cout << endl;
-  printInOrder(root, 0);
+  cout << "Expression Tree:" << endl;
+  printExpressionTree(root, 0);
+
+  cout << endl;
+  cout << "Enter \"INFIX\" \"PREFIX\" \"POSTFIX\": ";
+  cin.getline(input, 20);
+
+  if (strcmp(input, "INFIX") == 0) {
+    infix(root);
+  }
+  else if (strcmp(input, "PREFIX") == 0) {
+    prefix(root);
+  }
+  else if (strcmp(input, "POSTFIX") == 0) {
+    postfix(root);
+  }
+  else {
+    cout << "Invalid input" << endl;
+  }
   
   return 0;
   
@@ -264,19 +283,61 @@ Node * makeTree(Queue output) {
   return root;
 }
 
-void printInOrder(Node * current, int layer) {
+void printExpressionTree(Node * current, int layer) {
 
   if (current == NULL) {
     return;
   }
 
-  printInOrder(current->right, layer + 1);
+  printExpressionTree(current->right, layer + 1);
 
   for (int i = 0; i < layer; i++) {
     cout << "    ";
   }
   cout << current->symbol << endl;
 
-  printInOrder(current->left, layer + 1);
+  printExpressionTree(current->left, layer + 1);
+  
+}
+
+void infix(Node * current) {
+
+  if (current == NULL) {
+    return;
+  }
+
+  infix(current->right);
+
+  cout << current->symbol;
+
+  infix(current->left);
+
+}
+
+void prefix(Node * current) {
+
+  if (current == NULL) {
+    return;
+  }
+
+  cout << current->symbol;
+  
+  prefix(current->left);
+
+  prefix(current->right);
+
+}
+
+void postfix(Node * current) {
+
+  if (current == NULL) {
+    return;
+  }
+
+  postfix(current->left);
+
+  postfix(current->right);
+
+  cout << current->symbol;
   
 }
