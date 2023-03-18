@@ -1,3 +1,7 @@
+//Noam Yaffe, Period 7
+//3/17/2023
+//The Shunting Yard Algorithm implements three data structures -- Queue, Stack, and Binary Expression Tree -- to convert
+//an inputted mathematical equation into infix, prefix, and postfix notations.
 #include <iostream>
 #include <cstring>
 #include "node.h"
@@ -10,7 +14,7 @@ struct Stack {
 
   Node * head = NULL;
 
-  //insert node into the stack
+  //inserts node into the stack
   void push(char c) {
     Node * newNode = new Node(c);
     if (head == NULL) {
@@ -21,7 +25,7 @@ struct Stack {
     head = newNode;
   }
 
-  //remove the head of the stack
+  //removes the head of the stack
   void pop() {
     if (head == NULL) {
       return;
@@ -32,7 +36,7 @@ struct Stack {
     delete temp;
   }
 
-  //look into the head of the stack
+  //looks into and returns the head of the stack
   char peek() {
     if (head == NULL) {
       return '\0';
@@ -40,13 +44,9 @@ struct Stack {
     return head->symbol;
   }
 
-  Node * peekNode() {
-    return head;
-  }
-
+  //prints out the stack
   void print() {
     Node * current = head;
-    //cout << endl;
     while (current != NULL) {
       cout << current->symbol;
       current = current->next;
@@ -61,7 +61,7 @@ struct TreeStack {
 
   Node * head = NULL;
 
-  //insert node into the stack
+  //inserts node into the stack
   void push(Node * n) {
     Node * newNode = new Node(n);
     if (head == NULL) {
@@ -72,7 +72,7 @@ struct TreeStack {
     head = newNode;
   }
 
-  //remove the head of the stack
+  //removes the head of the stack
   void pop() {
     if (head == NULL) {
       return;
@@ -83,7 +83,7 @@ struct TreeStack {
     delete temp;
   }
 
-  //look into the head of the stack
+  //looks into and returns the head of the stack
   Node * peek() {
     if (head == NULL) {
       return NULL;
@@ -99,7 +99,7 @@ struct Queue {
   Node * head = NULL;
   Node * tail = NULL;
 
-  //add a node to the end of the queue
+  //adds a node to the end of the queue
   void enqueue(char c) {
     Node * newNode = new Node(c);
     if (head == NULL) {
@@ -111,7 +111,7 @@ struct Queue {
     tail = newNode;
   }
 
-  //remove the head of the queue and return its symbol
+  //removes the head of the queue and return its symbol
   void dequeue() {
     if (head == NULL) {
       return;
@@ -122,6 +122,7 @@ struct Queue {
     delete temp;
   }
 
+  //looks into and returns the head of the queue
   char peek() {
     if (head == NULL) {
       return '\0';
@@ -129,6 +130,7 @@ struct Queue {
     return head->symbol;
   }
 
+  //prints out the queue
   void print() {
     Node * current = head;
     while (current != NULL) {
@@ -203,33 +205,40 @@ int main() {
     }
   }
 
+  //add the rest of the stack into the queue
   while (operators.peek() != '\0') {
     output.enqueue(operators.peek());
     operators.pop();
   }
 
+  //print out the queue (should already be in postfix notation)
   output.print();
-  //operators.print();
 
   Node * root = makeTree(output);
   cout << endl;
+  //print expression tree
   cout << "Expression Tree:" << endl;
   printExpressionTree(root, 0);
 
+  //choose output method
   cout << endl;
   cout << "Enter \"INFIX\" \"PREFIX\" \"POSTFIX\": ";
   cin.getline(input, 20);
 
   if (strcmp(input, "INFIX") == 0) {
+    //infix notation
     infix(root);
   }
   else if (strcmp(input, "PREFIX") == 0) {
+    //prefix notation
     prefix(root);
   }
   else if (strcmp(input, "POSTFIX") == 0) {
+    //postfix notation
     postfix(root);
   }
   else {
+    //invalid user input
     cout << "Invalid input" << endl;
   }
   
@@ -237,6 +246,7 @@ int main() {
   
 }
 
+//check the precedence of a mathematical symbol
 int checkPrecedence(char c) {
 
   if (c == '+' || c == '-') {
@@ -257,6 +267,7 @@ int checkPrecedence(char c) {
   
 }
 
+//creates the expression tree using the queue and tree stack
 Node * makeTree(Queue output) {
   char symbol = output.peek();
   TreeStack treeStack;
@@ -277,12 +288,13 @@ Node * makeTree(Queue output) {
     output.dequeue();
     symbol = output.peek();
   }
-  // When we're done, we are left with a single node in treeStack
-  // which is the tree root
+  //When we're done, we are left with a single node in treeStack
+  //which is the tree root
   Node * root = treeStack.peek();
   return root;
 }
 
+//prints out the expression tree using InOrder tree traversal
 void printExpressionTree(Node * current, int layer) {
 
   if (current == NULL) {
@@ -300,6 +312,7 @@ void printExpressionTree(Node * current, int layer) {
   
 }
 
+//prints tree in infix notation
 void infix(Node * current) {
 
   if (current == NULL) {
@@ -314,6 +327,7 @@ void infix(Node * current) {
 
 }
 
+//prints tree in prefix notation
 void prefix(Node * current) {
 
   if (current == NULL) {
@@ -328,6 +342,7 @@ void prefix(Node * current) {
 
 }
 
+//prints tree in postfix notation
 void postfix(Node * current) {
 
   if (current == NULL) {

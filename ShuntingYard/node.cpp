@@ -19,6 +19,7 @@ Node::Node(char symbol) {
   next = NULL;
 }
 
+//treeNode constructor
 Node::Node(Node * treeNode) {
   this->treeNode = treeNode;
   left = NULL;
@@ -27,7 +28,7 @@ Node::Node(Node * treeNode) {
   symbol = '\0';
 }
 
-//tree node constructor
+//node constructor
 Node::Node(Node * left, Node * right, char symbol) {
   this->left = left;
   this->right = right;
