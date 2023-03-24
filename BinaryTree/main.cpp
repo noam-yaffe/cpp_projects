@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <vector>
 #include <fstream>
 #include "node.h"
 
@@ -7,6 +8,10 @@ using namespace std;
 
 void fileGenerator();
 void manualGenerator();
+void makeTree(Node * &current, int num);
+void print(Node * current, int layer);
+
+Node * root = NULL;
 
 int main() {
 
@@ -37,6 +42,8 @@ int main() {
       cout << "You didn't enter a valid choice! Try again." << endl;
     }
   } while(!cont);
+
+  print(root, 0);
   
 }
 
@@ -44,7 +51,27 @@ int main() {
 void fileGenerator() {
 
   cout << "File generator..." << endl;
-  //continue;
+  ifstream numbers("numbers.txt");
+  srand(time(NULL));
+  int num = 0;
+  vector<int> nums;
+
+  while (!numbers.eof()) {
+    numbers >> num;
+    nums.push_back(num);
+  }
+
+  int randomIndex = 0;
+  int counter = 0;
+
+  while (counter != 10) {
+    randomIndex = (rand() % 999) + 1;
+    num = nums.at(randomIndex);
+    cout << num << " ";
+    makeTree(root, num);
+    counter++;
+  }
+  cout << endl;
   
 }
 
@@ -53,5 +80,51 @@ void manualGenerator() {
 
   cout << "Manual generator..." << endl;
   //continue...
+  
+}
+
+//not working atm
+void makeTree(Node * &current, int num) {
+  
+  if (current == NULL) {
+    current = new Node(num, NULL, NULL);
+    return;
+  }
+  if (num >= current->data) {
+    if (current->right == NULL) {
+      current->right = new Node(num, NULL, NULL);
+      return;
+    }
+    else {
+      makeTree(current->right, num);
+    }
+  }
+  //less than the current node
+  else {
+    if (current->left == NULL) {
+      current->left = new Node(num, NULL, NULL);
+      return;
+    }
+    else {
+      makeTree(current->left, num);
+    }
+  }
+
+}
+
+void print(Node * current, int layer) {
+
+  if (current == NULL) {
+    return;
+  }
+
+  print(current->right, layer++);
+
+  for (int i = 0; i < layer; i++) {
+    cout << "    ";
+  }
+  cout << current->data << endl;
+
+  print(current->left, layer++);
   
 }
