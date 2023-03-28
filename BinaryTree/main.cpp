@@ -10,13 +10,16 @@ void fileGenerator();
 void manualGenerator();
 void makeTree(Node * &current, int num);
 void print(Node * current, int layer);
+void search(Node * current, int num);
 
 Node * root = NULL;
 
 int main() {
 
+  char input[20];
   int answer = 0;
   bool cont = false;
+
   cout << endl;
   cout << "Welcome to Binary Search Tree!" << endl;
 
@@ -43,14 +46,47 @@ int main() {
     }
   } while(!cont);
 
+  cout << endl;
+  cout << "Current Tree:" << endl;
   print(root, 0);
+
+  cout << endl;
+  cout << "Here are the commands you can use:" << endl;
+  cout << "Type \"SEARCH\" to search for a particular number in the tree." << endl;
+  cout << "Type \"REMOVE\" to remove a particular number from the tree." << endl;
+  cout << "Type \"QUIT\" to end the program." << endl;
+
+  int numToSearch = 0;
+
+  //commands
+  do {
+    cout << endl;
+    cout << "Enter a command: ";
+    cin.get(input, 20);
+    cin.get();
+    //search for a number
+    if (strcmp(input, "SEARCH") == 0) {
+      cout << endl;
+      cout << "Enter the number you want to search for: ";
+      cin >> numToSearch;
+      cin.get();
+      search(root, numToSearch);
+    }
+    else if (strcmp(input, "QUIT") == 0) {
+      cout << "The program has ended." << endl;
+    }
+    else {	
+      cout << "You didn't enter a valid command. Try again." << endl;
+    }
+  } while (strcmp(input, "QUIT") != 0);
   
 }
 
 //generate initial binary tree via random file input
 void fileGenerator() {
 
-  cout << "File generator..." << endl;
+  cout << endl;
+  cout << "File generation..." << endl;
   ifstream numbers("numbers.txt");
   srand(time(NULL));
   int num = 0;
@@ -126,5 +162,27 @@ void print(Node * current, int layer) {
   cout << current->data << endl;
 
   print(current->left, layer + 1);
+  
+}
+
+void search(Node * current, int num) {
+
+  int data = 0;
+  
+  while (current != NULL) {
+    data = current->data;
+    if (data == num) {
+      cout << "Your number is in the tree!" << endl;
+      return;
+    }
+    if (num > data) {
+      current = current->right;
+    }
+    else {
+      current = current->left;
+    }
+  }
+
+  cout << "Your number is not in the tree." << endl;
   
 }
