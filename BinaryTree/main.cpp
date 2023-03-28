@@ -118,13 +118,13 @@ void print(Node * current, int layer) {
     return;
   }
 
-  print(current->right, layer++);
+  print(current->right, layer + 1);
 
   for (int i = 0; i < layer; i++) {
     cout << "    ";
   }
   cout << current->data << endl;
 
-  print(current->left, layer++);
+  print(current->left, layer + 1);
   
 }
