@@ -8,9 +8,10 @@ using namespace std;
 
 void fileGenerator();
 void manualGenerator();
-void makeTree(Node * &current, int num);
+void insert(Node * &current, int num);
 void print(Node * current, int layer);
 void search(Node * current, int num);
+Node * remove(Node * current, int num);
 
 Node * root = NULL;
 
@@ -25,7 +26,7 @@ int main() {
 
   do {
     cout << endl;
-    cout << "Type 1 to generate the numbers with a file (automatically generates 50 random numbers), type 2 to generate them manually\
+    cout << "Type 1 to generate the numbers with a file (automatically generates 10 random numbers), type 2 to generate them manually\
 : ";
     cin >> answer;
     cin.get();
@@ -47,16 +48,17 @@ int main() {
   } while(!cont);
 
   cout << endl;
-  cout << "Current Tree:" << endl;
   print(root, 0);
 
   cout << endl;
   cout << "Here are the commands you can use:" << endl;
+  cout << "Type \"ADD\" to add a number to the tree;" << endl;
   cout << "Type \"SEARCH\" to search for a particular number in the tree." << endl;
   cout << "Type \"REMOVE\" to remove a particular number from the tree." << endl;
+  cout << "Type \"PRINT\" to print out the tree." << endl;
   cout << "Type \"QUIT\" to end the program." << endl;
 
-  int numToSearch = 0;
+  int actionNumber = 0;
 
   //commands
   do {
@@ -64,15 +66,40 @@ int main() {
     cout << "Enter a command: ";
     cin.get(input, 20);
     cin.get();
+    //add a number
+    if (strcmp(input, "ADD") == 0) {
+      cout << endl;
+      cout << "Enter the number you want to add: ";
+      cin >> actionNumber;
+      cin.get();
+      insert(root, actionNumber);
+      cout << "Number has been added!" << endl;
+    }
     //search for a number
-    if (strcmp(input, "SEARCH") == 0) {
+    else if (strcmp(input, "SEARCH") == 0) {
       cout << endl;
       cout << "Enter the number you want to search for: ";
-      cin >> numToSearch;
+      cin >> actionNumber;
       cin.get();
-      search(root, numToSearch);
+      search(root, actionNumber);
     }
+    //remove a number
+    else if(strcmp(input, "REMOVE") == 0) {
+      cout << endl;
+      cout << "Enter the number you want to remove: ";
+      cin >> actionNumber;
+      cin.get();
+      root = remove(root, actionNumber);
+      cout << "Number has been removed!" << endl;
+    }
+    //print out the tree
+    else if (strcmp(input, "PRINT") == 0) {
+      cout << endl;
+      print(root, 0);
+    }
+    //end the program
     else if (strcmp(input, "QUIT") == 0) {
+      cout << endl;
       cout << "The program has ended." << endl;
     }
     else {	
@@ -104,7 +131,7 @@ void fileGenerator() {
     randomIndex = (rand() % 999) + 1;
     num = nums.at(randomIndex);
     cout << num << " ";
-    makeTree(root, num);
+    insert(root, num);
     counter++;
   }
   cout << endl;
@@ -120,7 +147,7 @@ void manualGenerator() {
 }
 
 //not working atm
-void makeTree(Node * &current, int num) {
+void insert(Node * &current, int num) {
   
   if (current == NULL) {
     current = new Node(num, NULL, NULL);
@@ -132,7 +159,7 @@ void makeTree(Node * &current, int num) {
       return;
     }
     else {
-      makeTree(current->right, num);
+      insert(current->right, num);
     }
   }
   //less than the current node
@@ -142,7 +169,7 @@ void makeTree(Node * &current, int num) {
       return;
     }
     else {
-      makeTree(current->left, num);
+      insert(current->left, num);
     }
   }
 
@@ -185,4 +212,64 @@ void search(Node * current, int num) {
 
   cout << "Your number is not in the tree." << endl;
   
+}
+
+//The algorithm below was inspired by the GeeksForGeeks article linked below:
+//https://www.geeksforgeeks.org/deletion-in-binary-search-tree/
+Node * remove(Node * current, int num) {
+
+  if (current == NULL) {
+    return current;
+  }
+
+  //searching for the node recursively
+  if (num > current->data) {
+    current->right = remove(current->right, num);
+    return current;
+  }
+  if (num < current->data) {
+    current->left = remove(current->left, num);
+    return current;
+  }
+  //node has been found
+  else {
+    //no children
+    if (current->right == NULL && current->left == NULL) {
+      return NULL;
+    }
+    //one right child
+    else if (current->left == NULL) {
+      Node * temp = current->right;
+      delete current;
+      return temp;
+    }
+    //one left child
+    else if (current->right == NULL) {
+      Node * temp = current->left;
+      delete current;
+      return temp;
+    }
+    //two children
+    else {
+      Node * succParent = current;
+      Node * succ = current->left;
+      //find node to replace current with
+      while (succ->right != NULL) {
+	succParent = succ;
+	succ = succ->right;
+      }
+      if (succParent != current) {
+	succParent->right = succ->left;
+      }
+      else {
+	succParent->left = succ->left;
+      }
+      current->data = succ->data;
+      delete succ;
+      return current;
+    }
+  }
+
+  return current;
+ 
 }
