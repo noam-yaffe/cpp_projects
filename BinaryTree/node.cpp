@@ -16,6 +16,5 @@ Node::Node() {
 }
 
 Node::~Node() {
-  delete right;
-  delete left;
+  //nothing
 }

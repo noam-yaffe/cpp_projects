@@ -112,8 +112,6 @@ int main() {
 //generate initial binary tree via random file input
 void fileGenerator() {
 
-  cout << endl;
-  cout << "File generation..." << endl;
   ifstream numbers("numbers.txt");
   srand(time(NULL));
   int num = 0;
@@ -141,12 +139,34 @@ void fileGenerator() {
 //generate initial binary tree via by user input
 void manualGenerator() {
 
-  cout << "Manual generator..." << endl;
-  //continue...
+  int input = 0;
+  int counter = 0;
+
+  cout << endl;
+  cout << "You will be prompted to manually enter numbers one-by-one." << endl;
+  cout << "You can terminate the loop by entering the number -1, but it automatically ends after you've entered a total of 50 numbers\
+." << endl;
+
+  while (input != 0 || counter < 50) {
+    cout << endl;
+    cout << "Enter a number: ";
+    cin >> input;
+    if (input == -1) {
+      break;
+    }
+    else {
+      insert(root, input);
+      cout << endl;
+      cout << "Number has been entered into the tree!" << endl;
+      counter++;
+    }
+  }
+
+  cin.get();
   
 }
 
-//not working atm
+//add data into the tree
 void insert(Node * &current, int num) {
   
   if (current == NULL) {
@@ -175,6 +195,7 @@ void insert(Node * &current, int num) {
 
 }
 
+//print out the tree (using the inOrder traversal algorithm)
 void print(Node * current, int layer) {
 
   if (current == NULL) {
@@ -186,6 +207,7 @@ void print(Node * current, int layer) {
   for (int i = 0; i < layer; i++) {
     cout << "    ";
   }
+  
   cout << current->data << endl;
 
   print(current->left, layer + 1);
@@ -261,6 +283,7 @@ Node * remove(Node * current, int num) {
       if (succParent != current) {
 	succParent->right = succ->left;
       }
+      //current's left is the replacement
       else {
 	succParent->left = succ->left;
       }
