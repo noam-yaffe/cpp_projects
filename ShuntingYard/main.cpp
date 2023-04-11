@@ -319,11 +319,11 @@ void infix(Node * current) {
     return;
   }
 
-  infix(current->right);
+  infix(current->left);
 
   cout << current->symbol;
 
-  infix(current->left);
+  infix(current->right);
 
 }
 
