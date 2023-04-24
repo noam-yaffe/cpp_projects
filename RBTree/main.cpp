@@ -164,6 +164,7 @@ void insert(Node * &current, int num) {
   if (num >= current->data) {
     if (current->right == NULL) {
       current->right = new Node(num, NULL, NULL, NULL, 'R');
+      checkForCases(current->right);
       return;
     }
     else {
@@ -174,6 +175,7 @@ void insert(Node * &current, int num) {
   else {
     if (current->left == NULL) {
       current->left = new Node(num, NULL, NULL, NULL, 'R');
+      checkForCases(current->right);
       return;
     }
     else {
@@ -215,6 +217,10 @@ void changeColor(Node * &current) {
 
 void checkForCases(Node * &current) {
 
+  if (current->parent == NULL || current->parent->parent == NULL) {//base case, no grandparent-->no uncle-->no cases to check for
+    return;
+  }
+  
   Node * grandparent = current->parent->parent;
   
   if (grandparent->right == current->parent) {//right parent
@@ -222,9 +228,18 @@ void checkForCases(Node * &current) {
     if ((uncle != NULL) && (uncle->color == 'R')) {//uncle is red
       redUncleRightParent(current);
       checkForCases(grandparent);//recursive call on grandparent
+      return;
     }
     if ((uncle == NULL) || (uncle->color == 'B')) {//uncle is black, initiate black left uncle cases
-      //...
+      if (current->parent->left == current) {//current is a left child, parent is a right child (triangle case)
+        rotateRight(current->parent);
+	checkForCases(current->parent);
+      }
+      else {//current is a right child, parent is a right child (line case)
+	recolor(current->parent);
+	recolor(grandparent);
+	rotateLeft(grandparent);
+      }
     }
   }
   else {//left parent
@@ -234,14 +249,23 @@ void checkForCases(Node * &current) {
       checkForCases(grandparent);//recursive call on grandparent
     }
     if ((uncle == NULL) || (uncle->color == 'B')) {//uncle is black, initiate black right uncle cases
-      //...
+      if (current->parent->right == current) {//current is a right child, parent is a left child (triangle case)
+        rotateLeft(current->parent);
+	checkForCases(current->parent);
+      }
+      else {//current is a left child, parent is a left child (line case)
+	recolor(current->parent);
+	recolor(grandparent);
+	rotateRight(grandparent);
+      }
     }
   }
 
-  return;
+  checkForCases(current->parent);
   
 }
 
+//recolors current's parent, grandparent, and uncle (specific to right parent)
 void redUncleRightParent(Node * &current) {
 
   recolor(current->parent);
@@ -250,10 +274,60 @@ void redUncleRightParent(Node * &current) {
   
 }
 
+//recolors current's parent, grandparent, and uncle (specific to left parent)
 void redUncleLeftParent(Node * &current) {
 
   recolor(current->parent);
   recolor(current->parent->parent);
   recolor(current->parent->parent->right);
+  
+}
+
+//NOTE: both my "rotateRight" and "rotateLeft" algorithms were referenced from the "CodesDope" website
+//https://www.codesdope.com/course/data-structures-red-black-trees-insertion/
+
+//right rotation
+void rotateRight(Node * &x) {
+
+  Node * y = x->left;
+  x->left = y->right;
+  if (y->right != NULL) {
+    y->right->parent = x;
+  }
+  y->parent = x->parent;
+  if (x->parent == NULL) {//x is the new root
+    root = y;
+  }
+  else if (x == x->parent->right) {//x is now a right child
+    x->parent->right = y;
+  }
+  else {//x is now a left child
+    x->parent->left = y;
+  }
+  y->right = x;
+  x->parent = y;
+  
+}
+
+//left rotation
+void rotateLeft(Node * &x) {
+
+  Node * y = x->right;
+  x->right = y->left;
+  if (y->left != NULL) {
+    y->left->parent = x;
+  }
+  y->parent = x->parent;
+  if (x->parent == NULL) {//x is the new root
+    root = y;
+  }
+  else if (x == x->parent->left) {//x is now a left child
+    x->parent->left = y;
+  }
+  else {//x is now a right child
+    x->parent->right = y;
+  }
+  y->left = x;
+  x->parent = y;
   
 }
