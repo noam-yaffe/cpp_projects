@@ -10,10 +10,12 @@ void fileGenerator();
 void manualGenerator();
 void insert(Node * &current, int num);
 void print(Node * current, int layer);
-void changeColor(Node * &current);
+void recolor(Node * &current);
 void checkForCases(Node * &current);
-void redUncleRightChild(Node * &current);
-void redUncleLeftChild(Node * &current);
+void redUncleRightParent(Node * &current);
+void redUncleLeftParent(Node * &current);
+void rotateRight(Node * &x);
+void rotateLeft(Node * &x);
 
 Node * root = NULL;
 
@@ -163,7 +165,7 @@ void insert(Node * &current, int num) {
   //greater than or equal to the current node
   if (num >= current->data) {
     if (current->right == NULL) {
-      current->right = new Node(num, NULL, NULL, NULL, 'R');
+      current->right = new Node(num, NULL, NULL, current, 'R');
       checkForCases(current->right);
       return;
     }
@@ -174,8 +176,8 @@ void insert(Node * &current, int num) {
   //less than the current node
   else {
     if (current->left == NULL) {
-      current->left = new Node(num, NULL, NULL, NULL, 'R');
-      checkForCases(current->right);
+      current->left = new Node(num, NULL, NULL, current, 'R');
+      checkForCases(current->left);
       return;
     }
     else {
@@ -204,7 +206,7 @@ void print(Node * current, int layer) {
   
 }
 
-void changeColor(Node * &current) {
+void recolor(Node * &current) {
 
   if (current->color == 'R') {//change from red to black
     current->color = 'B';
@@ -226,43 +228,60 @@ void checkForCases(Node * &current) {
   if (grandparent->right == current->parent) {//right parent
     Node * uncle = grandparent->left;
     if ((uncle != NULL) && (uncle->color == 'R')) {//uncle is red
+      cout << "uncle is red" << endl;
       redUncleRightParent(current);
       checkForCases(grandparent);//recursive call on grandparent
-      return;
     }
-    if ((uncle == NULL) || (uncle->color == 'B')) {//uncle is black, initiate black left uncle cases
+    else if ((uncle == NULL) || (uncle->color == 'B') && current->parent->color == 'R') {//black uncle cases
+      cout << "uncle is black" << endl;
       if (current->parent->left == current) {//current is a left child, parent is a right child (triangle case)
-        rotateRight(current->parent);
-	checkForCases(current->parent);
+	cout << "current is left, parent is right (triangle)" << endl;
+	Node * originalParent = current->parent;
+	rotateRight(current->parent);
+	checkForCases(originalParent);
       }
       else {//current is a right child, parent is a right child (line case)
+	cout << "current is right, parent is right (line)" << endl;
 	recolor(current->parent);
 	recolor(grandparent);
 	rotateLeft(grandparent);
+	checkForCases(grandparent);
       }
     }
+    if (root->color == 'R') {
+      recolor(root);
+    }
+    return;
   }
   else {//left parent
     Node * uncle = grandparent->right;
     if ((uncle != NULL) && (uncle->color == 'R')) {//uncle is red
+      cout << "uncle is red!" << endl;
       redUncleLeftParent(current);
       checkForCases(grandparent);//recursive call on grandparent
     }
-    if ((uncle == NULL) || (uncle->color == 'B')) {//uncle is black, initiate black right uncle cases
+    else if ((uncle == NULL) || (uncle->color == 'B') && current->parent->color == 'R') {//black uncle cases
+      cout << "uncle is black" << endl;
       if (current->parent->right == current) {//current is a right child, parent is a left child (triangle case)
-        rotateLeft(current->parent);
-	checkForCases(current->parent);
+	cout << "current is right, parent is left (triangle)" << endl;
+	Node * originalParent = current->parent;
+	rotateLeft(current->parent);
+	checkForCases(originalParent);
       }
       else {//current is a left child, parent is a left child (line case)
+	cout << "current is left, parent is left (line)" << endl;
 	recolor(current->parent);
 	recolor(grandparent);
 	rotateRight(grandparent);
+	checkForCases(grandparent);
       }
     }
+    if (root->color == 'R') {
+      recolor(root);
+    }
+    return;
   }
 
-  checkForCases(current->parent);
-  
 }
 
 //recolors current's parent, grandparent, and uncle (specific to right parent)
