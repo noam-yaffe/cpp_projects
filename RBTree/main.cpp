@@ -14,8 +14,8 @@ void recolor(Node * &current);
 void checkForCases(Node * &current);
 void redUncleRightParent(Node * &current);
 void redUncleLeftParent(Node * &current);
-void rotateRight(Node * &x);
-void rotateLeft(Node * &x);
+Node * rotateRight(Node * &x);
+Node * rotateLeft(Node * &x);
 
 Node * root = NULL;
 
@@ -235,16 +235,20 @@ void checkForCases(Node * &current) {
     else if ((uncle == NULL) || (uncle->color == 'B') && current->parent->color == 'R') {//black uncle cases
       cout << "uncle is black" << endl;
       if (current->parent->left == current) {//current is a left child, parent is a right child (triangle case)
-	cout << "current is left, parent is right (triangle)" << endl;
+	cout << "triangle, rotating right..." << endl;
 	Node * originalParent = current->parent;
-	rotateRight(current->parent);
+	Node * tempParent = current->parent;
+	current = rotateRight(tempParent);
+	cout << "current: " << current->data << endl;
+	cout << "current's parent: " << current->parent << endl;
+	cout << "current's right: " << current->right << endl;
 	checkForCases(originalParent);
       }
       else {//current is a right child, parent is a right child (line case)
-	cout << "current is right, parent is right (line)" << endl;
+	cout << "line, rotating left..." << endl;
 	recolor(current->parent);
 	recolor(grandparent);
-	rotateLeft(grandparent);
+	current->parent = rotateLeft(grandparent);
 	checkForCases(grandparent);
       }
     }
@@ -263,16 +267,20 @@ void checkForCases(Node * &current) {
     else if ((uncle == NULL) || (uncle->color == 'B') && current->parent->color == 'R') {//black uncle cases
       cout << "uncle is black" << endl;
       if (current->parent->right == current) {//current is a right child, parent is a left child (triangle case)
-	cout << "current is right, parent is left (triangle)" << endl;
+	cout << "triangle, rotating left..." << endl;
 	Node * originalParent = current->parent;
-	rotateLeft(current->parent);
+	Node * tempParent = current->parent;
+	current = rotateLeft(tempParent);
+	cout << "current: " << current->data << endl;
+	cout << "current's parent: " << current->parent << endl;
+        cout << "current's left: " << current->left << endl;
 	checkForCases(originalParent);
       }
       else {//current is a left child, parent is a left child (line case)
-	cout << "current is left, parent is left (line)" << endl;
+	cout << "line, rotating right..." << endl;
 	recolor(current->parent);
 	recolor(grandparent);
-	rotateRight(grandparent);
+	current->parent = rotateRight(grandparent);
 	checkForCases(grandparent);
       }
     }
@@ -306,12 +314,16 @@ void redUncleLeftParent(Node * &current) {
 //https://www.codesdope.com/course/data-structures-red-black-trees-insertion/
 
 //right rotation
-void rotateRight(Node * &x) {
+Node * rotateRight(Node * &x) {
 
   Node * y = x->left;
   x->left = y->right;
   if (y->right != NULL) {
+    x->left = y->right;
     y->right->parent = x;
+  }
+  else {
+    x->left = NULL;
   }
   y->parent = x->parent;
   if (x->parent == NULL) {//x is the new root
@@ -325,16 +337,21 @@ void rotateRight(Node * &x) {
   }
   y->right = x;
   x->parent = y;
+
+  return y;
   
 }
 
 //left rotation
-void rotateLeft(Node * &x) {
+Node * rotateLeft(Node * &x) {
 
   Node * y = x->right;
-  x->right = y->left;
   if (y->left != NULL) {
+    x->right = y->left;
     y->left->parent = x;
+  }
+  else {
+    x->right = NULL;
   }
   y->parent = x->parent;
   if (x->parent == NULL) {//x is the new root
@@ -348,5 +365,7 @@ void rotateLeft(Node * &x) {
   }
   y->left = x;
   x->parent = y;
+
+  return y;
   
 }
