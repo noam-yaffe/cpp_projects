@@ -2,7 +2,7 @@
 
 using namespace std;
 
-class Node {
+class Node {//node class
  public:
   int data;
   Node * right;

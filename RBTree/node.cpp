@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Node::Node(int data, Node * right, Node * left, Node * parent, char color) {
+Node::Node(int data, Node * right, Node * left, Node * parent, char color) {//node constructor: data, children, and parent
   this->data = data;
   this->right = right;
   this->left = left;
@@ -11,7 +11,7 @@ Node::Node(int data, Node * right, Node * left, Node * parent, char color) {
   this->color = color;
 }
 
-Node::Node() {
+Node::Node() {//default constructor: node color set to black ('B') by default
   data = 0;
   right = NULL;
   left = NULL;

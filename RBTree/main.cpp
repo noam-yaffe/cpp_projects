@@ -1,3 +1,9 @@
+/*
+ *Noam Yaffe
+ *05/01/2023
+ *In this project, I implemetned the "Red Black Tree" datastructure to store and sort interconnected nodes that each carry data,
+ *a pointer to their left and right child, and a pointer to their parent.
+ */
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -105,14 +111,10 @@ void fileGenerator() {
     int num = 0;
     vector<int> nums;
 
-    cout << "test" << endl;
-
     while (!numbers.eof()) {
         numbers >> num;
         nums.push_back(num);
     }
-
-    cout << "test" << endl;
 
     int randomIndex = 0;
     int counter = 0;
@@ -210,6 +212,7 @@ void print(Node* current, int layer) {
 
 }
 
+//recolors current (R --> B, B --> R)
 void recolor(Node*& current) {
 
     if (current->color == 'R') {//change from red to black
@@ -221,6 +224,7 @@ void recolor(Node*& current) {
 
 }
 
+//checks all cases every time a node is added
 void checkForCases(Node*& current) {
 
     if (current == NULL || current->parent == NULL || current->parent->parent == NULL) {//base case, no grandparent-->no uncle-->no cases to check for
@@ -232,19 +236,15 @@ void checkForCases(Node*& current) {
     if (grandparent->right == current->parent) {//right parent
         Node* uncle = grandparent->left;
         if ((uncle != NULL) && (uncle->color == 'R')) {//uncle is red
-            //cout << "uncle is red" << endl;
             redUncleRightParent(current);
-            checkForCases(grandparent);//recursive call on grandparent
+            checkForCases(grandparent);
         }
         else if (((uncle == NULL) || (uncle->color == 'B')) && current->parent->color == 'R') {//black uncle cases
-            //cout << "uncle is black" << endl;
             if (current->parent->left == current) {//current is a left child, parent is a right child (triangle case)
-                //cout << "current is left, parent is right (triangle)" << endl;
                 Node * temp = rotateRight(current->parent);
                 checkForCases(temp->right);
             }
             else {//current is a right child, parent is a right child (line case)
-                //cout << "current is right, parent is right (line)" << endl;
                 recolor(current->parent);
                 recolor(grandparent);
                 Node * temp = rotateLeft(current->parent->parent);
@@ -259,26 +259,22 @@ void checkForCases(Node*& current) {
     else {//left parent
         Node* uncle = grandparent->right;
         if ((uncle != NULL) && (uncle->color == 'R')) {//uncle is red
-            //cout << "uncle is red!" << endl;
             redUncleLeftParent(current);
-            checkForCases(grandparent);//recursive call on grandparent
+            checkForCases(grandparent);
         }
         else if (((uncle == NULL) || (uncle->color == 'B')) && current->parent->color == 'R') {//black uncle cases
-            //cout << "uncle is black" << endl;
             if (current->parent->right == current) {//current is a right child, parent is a left child (triangle case)
-                //cout << "current is right, parent is left (triangle)" << endl;
                 Node * temp = rotateLeft(current->parent);
                 checkForCases(temp->left);
             }
             else {//current is a left child, parent is a left child (line case)
-                //cout << "current is left, parent is left (line)" << endl;
                 recolor(current->parent);
                 recolor(grandparent);
                 Node * temp = rotateRight(current->parent->parent);
                 checkForCases(grandparent);
             }
         }
-        if (root->color == 'R') {
+        if (root->color == 'R') {//always make sure the root is black
             recolor(root);
         }
         return;
