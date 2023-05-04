@@ -116,12 +116,10 @@ void fileGenerator() {
         nums.push_back(num);
     }
 
-    int randomIndex = 0;
     int counter = 0;
 
     while (counter != 10) {
-        randomIndex = (rand() % 999) + 1;
-        num = nums.at(randomIndex);
+        num = nums.at(counter);
         cout << num << " ";
         insert(root, num);
         counter++;
