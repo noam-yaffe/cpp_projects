@@ -109,23 +109,22 @@ void fileGenerator() {
     ifstream numbers("numbers.txt");
     srand(time(NULL));
     int num = 0;
-    vector<int> nums;
+    //vector<int> nums;
 
     while (!numbers.eof()) {
         numbers >> num;
-        nums.push_back(num);
-    }
-
-    int randomIndex = 0;
-    int counter = 0;
-
-    while (counter != 10) {
-        randomIndex = (rand() % 999) + 1;
-        num = nums.at(randomIndex);
-        cout << num << " ";
         insert(root, num);
-        counter++;
+        //nums.push_back(num);
     }
+
+    //int counter = 0;
+
+    //while (counter != 10) {
+    //  num = nums.at(counter);
+    //  cout << num << " ";
+    //  insert(root, num);
+    //  counter++;
+    //}
     cout << endl;
 
 }

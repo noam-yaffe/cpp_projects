@@ -12,6 +12,7 @@ void print(Node* current, int layer);
 void search(Node* current, int number);
 void recolor(Node*& current);
 void checkForCases(Node*& current);
+Node * remove(Node* current, int num);
 void redUncleRightParent(Node*& current);
 void redUncleLeftParent(Node*& current);
 Node * rotateRight(Node* x);
@@ -59,6 +60,7 @@ int main() {
     cout << "Type \"ADD\" to add a number to the tree." << endl;
     cout << "Type \"PRINT\" to print out the tree." << endl;
     cout << "Type \"SEARCH\" to search for a particular number in the tree." << endl;
+    cout << "Type \"DELETE\" to delete a particular number from the tree." << endl;
     cout << "Type \"QUIT\" to end the program." << endl;
 
     int actionNumber = 0;
@@ -78,18 +80,26 @@ int main() {
             insert(root, actionNumber);
             cout << "Number has been added!" << endl;
         }
-
         //print out the tree
         else if (strcmp(input, "PRINT") == 0) {
             cout << endl;
             print(root, 0);
         }
+	//search for a number in the tree
 	else if (strcmp(input, "SEARCH") == 0) {
 	  cout << endl;
 	  cout << "Enter the number you want to search for: ";
 	  cin >> actionNumber;
 	  cin.get();
 	  search(root, actionNumber);
+	}
+	//delete a number from the tree
+	else if (strcmp(input, "DELETE") == 0) {
+	  cout << endl;
+	  cout << "Enter the number you want to delete: ";
+	  cin >> actionNumber;
+	  cin.get();
+	  root = remove(root, actionNumber);
 	}
         //end the program
         else if (strcmp(input, "QUIT") == 0) {
@@ -292,6 +302,90 @@ void checkForCases(Node*& current) {
         return;
     }
 
+}
+
+Node * remove(Node* current, int num) {
+
+  if (current == NULL) {
+    return current;
+  }
+
+  //searching for the node recursively
+  if (num > current->data) {
+    current->right = remove(current->right, num);
+    return current;
+  }
+  if (num < current->data) {
+    current->left = remove(current->left, num);
+    return current;
+  }
+  //node has been found
+  else {
+    if (current->right == NULL && current->left == NULL) {//no children
+      if (current->color == 'R') {//current is red
+	delete current;
+	return NULL;
+      }
+      else {//current is black, double-black node
+	//...
+      }
+      return current;
+    }
+    //one right child
+    else if (current->left == NULL) {//one right child
+      if (current->color == 'R') {//current is red
+	Node * temp = current->right;
+	delete current;
+	return temp;
+      }
+      else {//current is black
+	if (current->right->color == 'R') {//child is red
+	  Node * temp = current->right;
+	  delete current;
+	  temp->color = 'B';
+	  return temp;
+	}
+	else {//double-black node, initiate deletion cases
+	  //...
+	}
+      }
+      return current;
+    }
+    //one left child
+    else if (current->right == NULL) {//one left child
+      if (current->color == 'R') {//current is red
+	Node * temp = current->left;
+	delete current;
+	return temp;
+      }
+      else {//current is black
+	if (current->left->color == 'R') {//child is red
+	  Node * temp = current->left;
+	  delete current;
+	  temp->color = 'B';
+	  return temp;
+	}
+	else {//double-black node, intiate deletion cases
+	  
+	}
+      }
+    }
+    //two children
+    else {
+      Node * succ = current->left;
+      //find node to replace current with
+      while (succ->right != NULL) {
+        succ = succ->right;
+      }
+      current->data = succ->data;
+      succ = remove(succ, succ->data);
+      delete succ;
+      return current;
+    }
+  }
+
+  return current;
+  
 }
 
 //recolors current's parent, grandparent, and uncle (specific to right parent)
