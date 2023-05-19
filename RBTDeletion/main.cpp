@@ -13,6 +13,7 @@ void search(Node* current, int number);
 void recolor(Node*& current);
 void checkForCases(Node*& current);
 Node * remove(Node* current, int num);
+Node * deletionFix(Node*& current);
 void redUncleRightParent(Node*& current);
 void redUncleLeftParent(Node*& current);
 Node * rotateRight(Node* x);
@@ -327,7 +328,10 @@ Node * remove(Node* current, int num) {
 	return NULL;
       }
       else {//current is black, double-black node
-	//...
+        Node temp = current->right;
+	delete current;
+	deletionFix(temp);
+	return temp;
       }
       return current;
     }
@@ -346,7 +350,10 @@ Node * remove(Node* current, int num) {
 	  return temp;
 	}
 	else {//double-black node, initiate deletion cases
-	  //...
+	  Node temp = current->right;
+	  delete current;
+	  deletionFix(temp);
+	  return temp;
 	}
       }
       return current;
@@ -366,9 +373,13 @@ Node * remove(Node* current, int num) {
 	  return temp;
 	}
 	else {//double-black node, intiate deletion cases
-	  
+	  Node temp = current->left;
+	  delete current;
+	  deletionFix(temp);
+	  return temp;
 	}
       }
+      return current;
     }
     //two children
     else {
@@ -379,12 +390,120 @@ Node * remove(Node* current, int num) {
       }
       current->data = succ->data;
       succ = remove(succ, succ->data);
-      delete succ;
       return current;
     }
   }
 
   return current;
+  
+}
+
+void deletionFix(Node*& current) {//current is the double-black node
+
+  if (current->parent == NULL) {//case 1
+
+    return;
+
+  }
+
+  Node * sibling = findSibling(current);
+  siblingParent = sibling->parent;
+
+  else if (sibling->color == 'R' && current->parent == 'B' && (sibling->left == 'B' && sibling->right == 'B') {//case 2
+    //exchange parent and sibling's colors
+    sibling->color = parent->color;
+    current->parent->color = 'R';
+    if (isRightChild(sibling)) {//sibling is right child, rotate left with parent
+      rotateLeft(sibling->parent);
+    }
+    else {//sibling is left child, rotate right with parent
+      rotateRight(sibling->parent);
+    }
+    deletionFix(current);
+  }
+  
+  else if (current->parent->color == 'B' && sibling->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 3
+    sibling->color == 'R';
+    deletionFix(current->parent);
+  }
+  
+  else if (current->parent->color == 'R' && sibling->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 4
+    parent->color = sibling->color;
+    sibling->color = 'R';
+  }
+  
+  else if (current->parent->color == 'B' && sibling->color == 'B') {//case 5
+    if (sibling->left->color == 'R' && sibling->right->color == 'B') {//left child is red, right child is black
+      sibling->left->color = sibling->color;
+      sibling->color = 'R';
+      rotateRight(sibling);
+      deletionFix(current);
+    }
+    else if (sibling->right->color == 'B' && sibling->left->color == 'R') {//right child is red, left child is black
+      sibling->right->color = sibling->color;
+      sibling->color = 'R';
+      rotateLeft(sibling);
+      deletionFix(current);
+    }
+  }
+  
+  else if (sibling->color == 'B') {//case 6
+    if (sibling->left->color == 'R') {
+      sibling->color = current->parent->color;
+      current->parent->color = 'B';
+      sibling->left->color = 'B';
+      if (isRightChild(sibling)) {
+        rotateLeft(current->parent);
+      }
+      else {
+	rotateRight(current->parent);
+      }
+      return;
+    }
+    else if(sibling->right->color == 'R') {
+      sibling->color = current->parent->color;
+      current->parent->color = 'B';
+      sibling->right->color = 'B';
+      if (isRightChild(sibling)) {
+        rotateLeft(current->parent);
+      }
+      else {
+        rotateRight(current->parent);
+      }
+      return;//simplify case 6 by combining some of the code
+    }
+  }
+
+  return;//no more fixes
+
+}
+
+Node * findSibling(Node * current) {
+
+  if (current->parent->left == current) {//current is a left child, sibling is the right child
+    return current->parent->right;
+  }
+  else {//current is a right child, sibling is the left child
+    return current->parent->left;
+  }
+  
+}
+
+bool isRightChild(Node * current) {
+
+  if (current->parent->right == current) {
+    return true;
+  }
+  return false;
+  
+}
+
+bool isLeftChild(Node * current) {
+
+  if (current->parent->left == current) {
+    return true;
+  }
+  return false;
   
 }
 
