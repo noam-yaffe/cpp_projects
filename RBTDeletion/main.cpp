@@ -13,7 +13,10 @@ void search(Node* current, int number);
 void recolor(Node*& current);
 void checkForCases(Node*& current);
 Node * remove(Node* current, int num);
-Node * deletionFix(Node*& current);
+void deletionFix(Node*& current);
+Node * findSibling(Node * current);
+bool isRightChild(Node * current);
+bool isLeftChild(Node * current);
 void redUncleRightParent(Node*& current);
 void redUncleLeftParent(Node*& current);
 Node * rotateRight(Node* x);
@@ -328,7 +331,7 @@ Node * remove(Node* current, int num) {
 	return NULL;
       }
       else {//current is black, double-black node
-        Node temp = current->right;
+        Node * temp = current->right;
 	delete current;
 	deletionFix(temp);
 	return temp;
@@ -350,7 +353,7 @@ Node * remove(Node* current, int num) {
 	  return temp;
 	}
 	else {//double-black node, initiate deletion cases
-	  Node temp = current->right;
+	  Node * temp = current->right;
 	  delete current;
 	  deletionFix(temp);
 	  return temp;
@@ -373,7 +376,7 @@ Node * remove(Node* current, int num) {
 	  return temp;
 	}
 	else {//double-black node, intiate deletion cases
-	  Node temp = current->left;
+	  Node * temp = current->left;
 	  delete current;
 	  deletionFix(temp);
 	  return temp;
@@ -401,17 +404,14 @@ Node * remove(Node* current, int num) {
 void deletionFix(Node*& current) {//current is the double-black node
 
   if (current->parent == NULL) {//case 1
-
     return;
-
   }
 
   Node * sibling = findSibling(current);
-  siblingParent = sibling->parent;
 
-  else if (sibling->color == 'R' && current->parent == 'B' && (sibling->left == 'B' && sibling->right == 'B') {//case 2
+  if (sibling->color == 'R' && current->parent->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 2
     //exchange parent and sibling's colors
-    sibling->color = parent->color;
+    sibling->color = current->parent->color;
     current->parent->color = 'R';
     if (isRightChild(sibling)) {//sibling is right child, rotate left with parent
       rotateLeft(sibling->parent);
@@ -428,7 +428,7 @@ void deletionFix(Node*& current) {//current is the double-black node
   }
   
   else if (current->parent->color == 'R' && sibling->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 4
-    parent->color = sibling->color;
+    current->parent->color = sibling->color;
     sibling->color = 'R';
   }
   
@@ -470,7 +470,7 @@ void deletionFix(Node*& current) {//current is the double-black node
       else {
         rotateRight(current->parent);
       }
-      return;//simplify case 6 by combining some of the code
+      return;
     }
   }
 
