@@ -12,15 +12,18 @@ void print(Node* current, int layer);
 void search(Node* current, int number);
 void recolor(Node*& current);
 void checkForCases(Node*& current);
-Node * remove(Node* current, int num);
+Node* remove(Node*& z);
 void deletionFix(Node*& current);
-Node * findSibling(Node * current);
-bool isRightChild(Node * current);
-bool isLeftChild(Node * current);
+Node* lookFor(int num);
+Node* findSuccessor(Node* current);
+void transplant(Node*& current, Node*& replacement);
+Node* findSibling(Node* current);
+bool isRightChild(Node* current);
+bool isLeftChild(Node* current);
 void redUncleRightParent(Node*& current);
 void redUncleLeftParent(Node*& current);
-Node * rotateRight(Node* x);
-Node * rotateLeft(Node* x);
+Node* rotateRight(Node* x);
+Node* rotateLeft(Node* x);
 
 Node* root = NULL;
 
@@ -89,22 +92,28 @@ int main() {
             cout << endl;
             print(root, 0);
         }
-	//search for a number in the tree
-	else if (strcmp(input, "SEARCH") == 0) {
-	  cout << endl;
-	  cout << "Enter the number you want to search for: ";
-	  cin >> actionNumber;
-	  cin.get();
-	  search(root, actionNumber);
-	}
-	//delete a number from the tree
-	else if (strcmp(input, "DELETE") == 0) {
-	  cout << endl;
-	  cout << "Enter the number you want to delete: ";
-	  cin >> actionNumber;
-	  cin.get();
-	  root = remove(root, actionNumber);
-	}
+        //search for a number in the tree
+        else if (strcmp(input, "SEARCH") == 0) {
+            cout << endl;
+            cout << "Enter the number you want to search for: ";
+            cin >> actionNumber;
+            cin.get();
+            search(root, actionNumber);
+        }
+        //delete a number from the tree
+        else if (strcmp(input, "DELETE") == 0) {
+            cout << endl;
+            cout << "Enter the number you want to delete: ";
+            cin >> actionNumber;
+            cin.get();
+            Node* current = lookFor(actionNumber);
+            if (current == NULL) {
+                cout << "Your number isn't in the tree." << endl;
+            }
+            else {
+                current = remove(current);
+            }
+        }
         //end the program
         else if (strcmp(input, "QUIT") == 0) {
             cout << endl;
@@ -219,23 +228,23 @@ void print(Node* current, int layer) {
 
 void search(Node* current, int num) {
 
-  if (current == NULL) {//reached the end of the tree
-    cout << "Your number is not in the tree." << endl;
-    return;
-  }
-  else if (current->data == num) {//number has been found
-    cout << "Your number is in the tree!" << endl;
-    return;
-  }
-  else {//continue traversing down the tree
-    if (num > current->data) {
-      search(current->right, num);
+    if (current == NULL) {//reached the end of the tree
+        cout << "Your number is not in the tree." << endl;
+        return;
     }
-    else {
-      search(current->left, num);
+    else if (current->data == num) {//number has been found
+        cout << "Your number is in the tree!" << endl;
+        return;
     }
-  }
-  
+    else {//continue traversing down the tree
+        if (num > current->data) {
+            search(current->right, num);
+        }
+        else {
+            search(current->left, num);
+        }
+    }
+
 }
 
 //recolors current (R --> B, B --> R)
@@ -267,13 +276,13 @@ void checkForCases(Node*& current) {
         }
         else if (((uncle == NULL) || (uncle->color == 'B')) && current->parent->color == 'R') {//black uncle cases
             if (current->parent->left == current) {//current is a left child, parent is a right child (triangle case)
-                Node * temp = rotateRight(current->parent);
+                Node* temp = rotateRight(current->parent);
                 checkForCases(temp->right);
             }
             else {//current is a right child, parent is a right child (line case)
                 recolor(current->parent);
                 recolor(grandparent);
-                Node * temp = rotateLeft(current->parent->parent);
+                Node* temp = rotateLeft(current->parent->parent);
                 checkForCases(grandparent);
             }
         }
@@ -290,13 +299,13 @@ void checkForCases(Node*& current) {
         }
         else if (((uncle == NULL) || (uncle->color == 'B')) && current->parent->color == 'R') {//black uncle cases
             if (current->parent->right == current) {//current is a right child, parent is a left child (triangle case)
-                Node * temp = rotateLeft(current->parent);
+                Node* temp = rotateLeft(current->parent);
                 checkForCases(temp->left);
             }
             else {//current is a left child, parent is a left child (line case)
                 recolor(current->parent);
                 recolor(grandparent);
-                Node * temp = rotateRight(current->parent->parent);
+                Node* temp = rotateRight(current->parent->parent);
                 checkForCases(grandparent);
             }
         }
@@ -308,203 +317,198 @@ void checkForCases(Node*& current) {
 
 }
 
-Node * remove(Node* current, int num) {
+Node* remove(Node*& z) {
 
-  if (current == NULL) {
-    return current;
-  }
+    //KEY: z = current, y = successor of current, x = child (of either current or successor)
 
-  //searching for the node recursively
-  if (num > current->data) {
-    current->right = remove(current->right, num);
-    return current;
-  }
-  if (num < current->data) {
-    current->left = remove(current->left, num);
-    return current;
-  }
-  //node has been found
-  else {
-    if (current->right == NULL && current->left == NULL) {//no children
-      if (current->color == 'R') {//current is red
-	delete current;
-	return NULL;
-      }
-      else {//current is black, double-black node
-        Node * temp = current->right;
-	delete current;
-	deletionFix(temp);
-	return temp;
-      }
-      return current;
+    Node* y = z;
+    char y_og_color = y->color;
+    Node* x = NULL;
+
+    if (z->left == NULL) {//case 1
+        x = z->right;
+        transplant(z, x);
     }
-    //one right child
-    else if (current->left == NULL) {//one right child
-      if (current->color == 'R') {//current is red
-	Node * temp = current->right;
-	delete current;
-	return temp;
-      }
-      else {//current is black
-	if (current->right->color == 'R') {//child is red
-	  Node * temp = current->right;
-	  delete current;
-	  temp->color = 'B';
-	  return temp;
-	}
-	else {//double-black node, initiate deletion cases
-	  Node * temp = current->right;
-	  delete current;
-	  deletionFix(temp);
-	  return temp;
-	}
-      }
-      return current;
+    else if (z->right == NULL) {//case 2
+        x = z->left;
+        transplant(z, x);
     }
-    //one left child
-    else if (current->right == NULL) {//one left child
-      if (current->color == 'R') {//current is red
-	Node * temp = current->left;
-	delete current;
-	return temp;
-      }
-      else {//current is black
-	if (current->left->color == 'R') {//child is red
-	  Node * temp = current->left;
-	  delete current;
-	  temp->color = 'B';
-	  return temp;
-	}
-	else {//double-black node, intiate deletion cases
-	  Node * temp = current->left;
-	  delete current;
-	  deletionFix(temp);
-	  return temp;
-	}
-      }
-      return current;
+    else {//case 3
+        y = findSuccessor(z->right);
+        y_og_color = y->color;
+        x = y->right;
+
+        if (y->parent == z && x != NULL) {
+            if (x != NULL) {
+                x->parent = y;
+            }
+        }
+        else {
+            transplant(y, x);
+            y->right = z->right;
+            if (x != NULL) {
+                y->right->parent = y;
+            }
+        }
+
+        transplant(z, y);
+        y->left = z->left;
+        y->left->parent = y;
+        y->color = z->color;
+
     }
-    //two children
+
+    if (y_og_color == 'B') {
+        deletionFix(x);
+    }
+
+    return x;
+
+}
+
+void deletionFix(Node*& x) {//current is the double-black node
+
+  //KEY: x = double-black node, w = x's sibling
+
+    while (x != root && x->color == 'B') {
+
+        if (x->parent->left == x) {//x is a left child
+
+            Node* w = x->parent->right;
+            if (w->color == 'R') {//deletion fix case 1
+                w->color = 'B';
+                x->parent->color = 'R';
+                rotateLeft(x->parent);
+                w = x->parent->right;//I see an issue with this... I want the pointer to POINT to the new x's sibling, not replace itself
+            }
+            if (w->left->color == 'B' && w->right->color == 'B') {//deletion fix case 2
+                w->color = 'R';
+                x = x->parent;
+            }
+            else {
+                if (w->right->color == 'B') {//deletion fix case 3
+                    w->left->color = 'B';
+                    w->color = 'R';
+                    rotateRight(w);
+                    w = x->parent->right;
+                }//deletion fix case 4
+                w->color = x->parent->color;
+                x->parent->color = 'B';
+                w->right->color = 'B';
+                rotateLeft(x->parent);
+                x = root;
+            }
+
+        }
+        else {
+
+            Node* w = x->parent->left;
+            if (w->color == 'R') {//deletion fix case 1
+                w->color = 'B';
+                x->parent->color = 'R';
+                rotateRight(x->parent);
+                w = x->parent->left;
+            }
+            if (w->right->color == 'B' && w->left->color == 'B') {//deletion fix case 2
+                w->color = 'R';
+                x = x->parent;
+            }
+            else {
+                if (w->left->color == 'B') {//deletion fix case 3
+                    w->right->color = 'B';
+                    w->color = 'R';
+                    rotateLeft(w);
+                    w = x->parent->left;
+                }//deletion fix case 4
+                w->color = x->parent->color;
+                x->parent->color = 'B';
+                w->left->color = 'B';
+                rotateRight(x->parent);
+                x = root;
+            }
+
+        }
+
+    }
+
+    if (x != NULL) {
+        x->color = 'B';
+    }
+
+}
+
+void transplant(Node*& current, Node*& replacement) {
+
+    if (current->parent == NULL) {
+        root = replacement;
+    }
+    else if (current == current->parent->left) {
+        current->parent->left = replacement;
+    }
     else {
-      Node * succ = current->left;
-      //find node to replace current with
-      while (succ->right != NULL) {
-        succ = succ->right;
-      }
-      current->data = succ->data;
-      succ = remove(succ, succ->data);
-      return current;
+        current->parent->right = replacement;
     }
-  }
 
-  return current;
-  
-}
-
-void deletionFix(Node*& current) {//current is the double-black node
-
-  if (current->parent == NULL) {//case 1
-    return;
-  }
-
-  Node * sibling = findSibling(current);
-
-  if (sibling->color == 'R' && current->parent->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 2
-    //exchange parent and sibling's colors
-    sibling->color = current->parent->color;
-    current->parent->color = 'R';
-    if (isRightChild(sibling)) {//sibling is right child, rotate left with parent
-      rotateLeft(sibling->parent);
+    if (replacement != NULL) {
+        replacement->parent = current->parent;
     }
-    else {//sibling is left child, rotate right with parent
-      rotateRight(sibling->parent);
-    }
-    deletionFix(current);
-  }
-  
-  else if (current->parent->color == 'B' && sibling->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 3
-    sibling->color == 'R';
-    deletionFix(current->parent);
-  }
-  
-  else if (current->parent->color == 'R' && sibling->color == 'B' && (sibling->left->color == 'B' && sibling->right->color == 'B')) {//case 4
-    current->parent->color = sibling->color;
-    sibling->color = 'R';
-  }
-  
-  else if (current->parent->color == 'B' && sibling->color == 'B') {//case 5
-    if (sibling->left->color == 'R' && sibling->right->color == 'B') {//left child is red, right child is black
-      sibling->left->color = sibling->color;
-      sibling->color = 'R';
-      rotateRight(sibling);
-      deletionFix(current);
-    }
-    else if (sibling->right->color == 'B' && sibling->left->color == 'R') {//right child is red, left child is black
-      sibling->right->color = sibling->color;
-      sibling->color = 'R';
-      rotateLeft(sibling);
-      deletionFix(current);
-    }
-  }
-  
-  else if (sibling->color == 'B') {//case 6
-    if (sibling->left->color == 'R') {
-      sibling->color = current->parent->color;
-      current->parent->color = 'B';
-      sibling->left->color = 'B';
-      if (isRightChild(sibling)) {
-        rotateLeft(current->parent);
-      }
-      else {
-	rotateRight(current->parent);
-      }
-      return;
-    }
-    else if(sibling->right->color == 'R') {
-      sibling->color = current->parent->color;
-      current->parent->color = 'B';
-      sibling->right->color = 'B';
-      if (isRightChild(sibling)) {
-        rotateLeft(current->parent);
-      }
-      else {
-        rotateRight(current->parent);
-      }
-      return;
-    }
-  }
-
-  return;//no more fixes
 
 }
 
-Node * findSibling(Node * current) {
+Node* lookFor(int num) {
 
-  if (current->parent->left == current) {//current is a left child, sibling is the right child
-    return current->parent->right;
-  }
-  else {//current is a right child, sibling is the left child
-    return current->parent->left;
-  }
-  
+    Node* iterator = root;
+
+    while (iterator != NULL && iterator->data != num) {
+        if (num < iterator->data) {
+            iterator = iterator->left;
+        }
+        else {
+            iterator = iterator->right;
+        }
+    }
+
+    return iterator;
+
 }
 
-bool isRightChild(Node * current) {
+Node* findSuccessor(Node* current) {
 
-  if (current->parent->right == current) {
-    return true;
-  }
-  return false;
-  
+    while (current->left != NULL) {
+        current = current->left;
+    }
+
+    return current;
+
 }
 
-bool isLeftChild(Node * current) {
+Node* findSibling(Node* current) {
 
-  if (current->parent->left == current) {
-    return true;
-  }
-  return false;
-  
+    if (current->parent->left == current) {//current is a left child, sibling is the right child
+        return current->parent->right;
+    }
+    else {//current is a right child, sibling is the left child
+        return current->parent->left;
+    }
+
+}
+
+bool isRightChild(Node* current) {
+
+    if (current->parent->right == current) {
+        return true;
+    }
+    return false;
+
+}
+
+bool isLeftChild(Node* current) {
+
+    if (current->parent->left == current) {
+        return true;
+    }
+    return false;
+
 }
 
 //recolors current's parent, grandparent, and uncle (specific to right parent)
@@ -529,7 +533,7 @@ void redUncleLeftParent(Node*& current) {
 //https://www.codesdope.com/course/data-structures-red-black-trees-insertion/
 
 //right rotation
-Node * rotateRight(Node* current) {
+Node* rotateRight(Node* current) {
 
     Node* leftNode = current->left;
     current->left = leftNode->right;
@@ -554,7 +558,7 @@ Node * rotateRight(Node* current) {
 }
 
 //left rotation
-Node * rotateLeft(Node* current) {
+Node* rotateLeft(Node* current) {
 
     Node* rightNode = current->right;
     current->right = rightNode->left;
