@@ -12,8 +12,8 @@ void print(Node* current, int layer);
 void search(Node* current, int number);
 void recolor(Node*& current);
 void checkForCases(Node*& current);
-Node* remove(Node*& z);
-void deletionFix(Node* current);
+Node* remove(Node* current, int num);
+void deletionFix(Node* current, Node* parent);
 Node* lookFor(int num);
 Node* findSuccessor(Node* current);
 void transplant(Node*& current, Node*& replacement);
@@ -106,13 +106,7 @@ int main() {
             cout << "Enter the number you want to delete: ";
             cin >> actionNumber;
             cin.get();
-            Node* current = lookFor(actionNumber);
-            if (current == NULL) {
-                cout << "Your number isn't in the tree." << endl;
-            }
-            else {
-                current = remove(current);
-            }
+            root = remove(root, actionNumber);
         }
         //end the program
         else if (strcmp(input, "QUIT") == 0) {
@@ -317,121 +311,191 @@ void checkForCases(Node*& current) {
 
 }
 
-Node* remove(Node*& z) {
-
-    //KEY: z = current, y = successor of current, x = child (of either current or successor)
-
-    Node* y = z;
-    char y_og_color = y->color;
-    Node* x = NULL;
-
-    if (z->left == NULL) {//case 1
-        x = z->right;
-        transplant(z, x);
+Node* remove(Node* current, int num) {
+    if (current == NULL) {
+        return current;
     }
-    else if (z->right == NULL) {//case 2
-        x = z->left;
-        transplant(z, x);
+    //searching for the node recursively
+    if (num > current->data) {
+        current->right = remove(current->right, num);
+        return current;
     }
-    else {//case 3
-        y = findSuccessor(z->right);
-        y_og_color = y->color;
-        x = y->right;
-
-        if (y->parent == z && x != NULL) {
-            if (x != NULL) {
-                x->parent = y;
+    if (num < current->data) {
+        current->left = remove(current->left, num);
+        return current;
+    }
+    //node has been found
+    else {
+        if (current->right == NULL && current->left == NULL) {//no children
+            if (current == root) {
+                delete current;
+                return NULL;
             }
+            if (current->color == 'R') {//current is red
+                delete current;
+                return NULL;
+            }
+            else {//current is black, double-black node
+                Node* temp = current->right;
+                delete current;
+                deletionFix(temp, temp->parent);
+                return temp;
+            }
+            return current;
         }
+        //one right child
+        else if (current->left == NULL) {//one right child
+            if (current->color == 'R') {//current is red
+                Node* temp = current->right;
+                delete current;
+                return temp;
+            }
+            else {//current is black
+                if (current->right->color == 'R') {//child is red
+                    Node* temp = current->right;
+                    delete current;
+                    temp->color = 'B';
+                    return temp;
+                }
+                else {//double-black node, initiate deletion cases
+                    Node* temp = current->right;
+                    delete current;
+                    deletionFix(temp, temp->parent);
+                    return temp;
+                }
+            }
+            return current;
+        }
+        //one left child
+        else if (current->right == NULL) {//one left child
+            if (current->color == 'R') {//current is red
+                Node* temp = current->left;
+                delete current;
+                return temp;
+            }
+            else {//current is black
+                if (current->left->color == 'R') {//child is red
+                    Node* temp = current->left;
+                    delete current;
+                    temp->color = 'B';
+                    return temp;
+                }
+                else {//double-black node, intiate deletion cases
+                    Node* temp = current->left;
+                    delete current;
+                    deletionFix(temp, temp->parent);
+                    return temp;
+                }
+            }
+            return current;
+        }
+        //two children
         else {
-            transplant(y, x);
-            y->right = z->right;
-            if (x != NULL) {
-                y->right->parent = y;
+            Node* succParent = current;
+            Node* succ = current->left;
+            //find node to replace current with
+            while (succ->right != NULL) {
+                succParent = succ;
+                succ = succ->right;
             }
+            if (succParent != current) {
+                succParent->right = succ->left;
+                //check if we need to call deletionCheck method
+                if (succ->color == 'B') {//successor was black
+                    if (succParent->right != NULL && succParent->right->color == 'R') {//make sure the node is black
+                        succParent->right->color = 'B';
+                    }
+                    else {//double-black node situation
+                        deletionFix(succParent->right, succParent);
+                    }
+                }
+            }
+            //current's left is the replacement
+            else {
+                succParent->left = succ->left;
+                //check if we need to call deletionCheck method
+                if (succ->color == 'B') {//successor was black
+                    if (succParent->left != NULL && succParent->left->color == 'R') {//make sure the node is black
+                        succParent->left->color = 'B';
+                    }
+                    else {//double-black node situation
+                        deletionFix(succParent->left, succParent);
+                    }
+                }
+            }
+            current->data = succ->data;
+            delete succ;
+            return current;
         }
-
-        transplant(z, y);
-        y->left = z->left;
-        y->left->parent = y;
-        y->color = z->color;
-
     }
-
-    if (y_og_color == 'B') {
-      deletionFix(x);
-    }
-
-    return x;
+    return current;
 
 }
 
-void deletionFix(Node* current) {//current is the double-black node
+void deletionFix(Node* current, Node * parent) {//current is the double-black node
 
-  Node * sibling = NULL;
-  
-  if (current == root) {//case 1, double-black node is the root
-    cout << "case 1" << endl;
-    return;
-  }
-  else {
-    Node * parent = current->parent;
-    sibling = findSibling(current);
-    if (sibling != NULL) {
-      if (sibling->color == 'R' && current->color == 'B' && parent->color == 'B') {//case 2, sibling is red, current & parent are black
-	cout << "case 2" << endl;
-	sibling->color = 'B';
-	parent->color = 'R';
-	if (isLeftChild(current)) {
-	  rotateLeft(parent);
-	  sibling = current->parent->right;//needs to be current->parent->right?
-	}
-	else {
-	  rotateRight(parent);
-	  sibling = current->parent->left;//needs to be current->parent->left?
-	}
-      }
-      if (sibling->color == 'B' && current->color == 'B' && parent->color == 'B' && (sibling->left == NULL || sibling->left->color == 'B') && (sibling->right == NULL || sibling->right->color == 'B')) {//case 3, sibling, current, parent, and sibling's children are black
-	cout << "case 3" << endl;
-	  sibling->color = 'R';
-	  deletionFix(current->parent);//needs to be current->parent?
-	}
-      else if (parent->color == 'R' && sibling->color == 'B' && (sibling->left == NULL || sibling->left->color == 'B') && (sibling->right == NULL || sibling->right->color == 'B')) {//case 4, parent is red, sibling and both its children are black
-	cout << "case 4" << endl;
-	  parent->color = 'B';
-	  sibling->color = 'R';
-	  return;
-	}
-	else if (isRightChild(current) && sibling->color == 'B'&& (sibling->left == NULL || sibling->left->color == 'B') && sibling->right != NULL && sibling->right->color == 'R') {//case 5, sibling and its left child are black, sibling's right child is red, and current is a right child
-	  cout << "case 5" << endl;
-	  sibling->color = 'R';
-	  sibling->right->color = 'B';
-	  rotateLeft(sibling);
-	  sibling = current->parent->left;
-	}
-	else if (isLeftChild(current) && sibling->color == 'B'&& (sibling->right == NULL || sibling->right->color == 'B') && sibling->left != NULL && sibling->left->color == 'R') {//case 5, sibling and its right child are black, sibling's left child is red, and current is a left child
-	  cout << "case 5" << endl;
-	  sibling->color = 'R';
-	  sibling->left->color = 'B';
-	  rotateRight(sibling);
-	  sibling = current->parent->right;
-	}
-	if (sibling->color == 'B' && isLeftChild(sibling) && sibling->left != NULL && sibling->left->color == 'R' && current->color == 'B') {//case 6, sibling is black, sibling's left child is red, and current is black
-	  cout << "case 6" << endl;
-	  sibling->color = parent->color;
-	  parent->color = 'B';
-	  rotateRight(parent);
-	  return;
-	}
-	else if (sibling->color == 'B' && isRightChild(sibling) && sibling->right != NULL && sibling->right->color == 'R' && current->color == 'B') {//case 6, sibling is black, sibling's right child is red, and current is black
-	  cout << "case 6" << endl;
-	  sibling->color = parent->color;
-	  parent->color = 'B';
-	  rotateLeft(parent);
-	  return;
-	}
+    Node* sibling = NULL;
+
+    if (current == root) {//case 1, double-black node is the root
+        return;
     }
-  }
+    else {
+        //Node* parent = current->parent;
+        if (parent->left == current) {
+            sibling = parent->right;
+        }
+        else {
+            sibling = parent->left;
+        }
+        //sibling = findSibling(current);
+        if (sibling != NULL) {
+            if (sibling->color == 'R' && parent->color == 'B') {//case 2, sibling is red, current & parent are black
+                sibling->color = 'B';
+                parent->color = 'R';
+                if (isRightChild(sibling)) {
+                    rotateLeft(parent);
+                    //sibling = current->parent->right;//needs to be current->parent->right?
+                }
+                else {
+                    rotateRight(parent);
+                    //sibling = current->parent->left;//needs to be current->parent->left?
+                }
+            }
+            if (sibling->color == 'B' && parent->color == 'B' && (sibling->left == NULL || sibling->left->color == 'B') && (sibling->right == NULL || sibling->right->color == 'B')) {//case 3, sibling, current, parent, and sibling's children are black
+                sibling->color = 'R';
+                deletionFix(parent, parent->parent);//needs to be current->parent?
+            }
+            else if (parent->color == 'R' && sibling->color == 'B' && (sibling->left == NULL || sibling->left->color == 'B') && (sibling->right == NULL || sibling->right->color == 'B')) {//case 4, parent is red, sibling and both its children are black
+                parent->color = 'B';
+                sibling->color = 'R';
+                return;
+            }
+            else if (isLeftChild(sibling) && sibling->color == 'B' && (sibling->left == NULL || sibling->left->color == 'B') && sibling->right != NULL && sibling->right->color == 'R') {//case 5, sibling and its left child are black, sibling's right child is red, and current is a right child
+                sibling->color = 'R';
+                sibling->right->color = 'B';
+                rotateLeft(sibling);
+                //sibling = current->parent->left;
+            }
+            else if (isRightChild(sibling) && sibling->color == 'B' && (sibling->right == NULL || sibling->right->color == 'B') && sibling->left != NULL && sibling->left->color == 'R') {//case 5, sibling and its right child are black, sibling's left child is red, and current is a left child
+                sibling->color = 'R';
+                sibling->left->color = 'B';
+                rotateRight(sibling);
+                //sibling = current->parent->right;
+            }
+            if (sibling->color == 'B' && isLeftChild(sibling) && sibling->left != NULL && sibling->left->color == 'R') {//case 6, sibling is black, sibling's left child is red, and current is black
+                sibling->color = parent->color;
+                parent->color = 'B';
+                rotateRight(parent);
+                return;
+            }
+            else if (sibling->color == 'B' && isRightChild(sibling) && sibling->right != NULL && sibling->right->color == 'R') {//case 6, sibling is black, sibling's right child is red, and current is black
+                sibling->color = parent->color;
+                parent->color = 'B';
+                rotateLeft(parent);
+                return;
+            }
+        }
+    }
 
 }
 
