@@ -337,8 +337,9 @@ Node* remove(Node* current, int num) {
             }
             else {//current is black, double-black node
                 Node* temp = current->right;
+                Node* tempParent = current->parent;
                 delete current;
-                deletionFix(temp, temp->parent);
+                deletionFix(temp, tempParent);
                 return temp;
             }
             return current;
